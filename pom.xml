@@ -132,7 +132,7 @@
                         </manifestEntries>
                     </archive>
  
-                    <finalName>MiCarpeta/MiJar</finalName>
+                    <finalName>MiCarpeta/planilla_jornal</finalName>
                 </configuration>
             </plugin>
         </plugins>

@@ -6,8 +6,6 @@
 package clases;
 
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -17,35 +15,37 @@ import javax.swing.JOptionPane;
 public class Conectar {
 
     private static final Varios c_varios = new Varios();
-    private static final String direccion = c_varios.obtenerDireccionCarpeta();
+    private static final String DIRECCION = c_varios.obtenerDireccionCarpeta();
 
     //private static final String url= direccion +"/pesaje_db.db";
     private static Connection conexion = null;
-    private static String bd = "liquidacion"; // Nombre de BD.
-    private static String user = "root"; // Usuario de BD.
-    private static String password = "root/*123"; // Password de BD.
+    private static final String BD = "liquidacion"; // Nombre de BD.
+    private static final String USER = "root"; // Usuario de BD.
+    private static final String PASSWORD = "root/*123"; // Password de BD.
 
     // Driver para MySQL en este caso.
-    private static String driver = "com.mysql.cj.jdbc.Driver";
-    String server = "jdbc:mysql://localhost/" + bd;
+    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
+    String server = "jdbc:mysql://192.168.0.6/" + BD;
 
     /**
-     * ***** Prueba con SQLite ******
+     * ***** Prueba con SQLite
+     *
+     ******
+     * @return
      */
     //private static String driver = "com.sqlite.jdbc.Driver";
-
     //private static String driver = "com.sqlite.jdbc.Driver";
     //String server = "jdbc:sqlite:" + url;
-    public boolean conectar()  {
+    public boolean conectar() {
         boolean conectado;
         try {
-            Class.forName(driver);
-            conexion = DriverManager.getConnection(server, user, password);
+            Class.forName(DRIVER);
+            conexion = DriverManager.getConnection(server, USER, PASSWORD);
             conectado = true;
             System.out.println("Conectando al Servidor: " + server);
 
         } catch (ClassNotFoundException | SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error: Imposible realizar la conexion a BD." + server + "," + user + "," + password + "\n" + e.getLocalizedMessage());
+            JOptionPane.showMessageDialog(null, "Error: Imposible realizar la conexion a BD." + server + "," + USER + "," + PASSWORD + "\n" + e.getLocalizedMessage());
             System.out.print(e);
             e.printStackTrace();
             System.exit(0);
@@ -122,7 +122,7 @@ public class Conectar {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.out.print("Error: No es posible cerrar la consulta.");
             }
         }
@@ -137,7 +137,7 @@ public class Conectar {
         if (st != null) {
             try {
                 st.close();
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.out.print("Error: No es posible cerrar la conexión.");
             }
         }
