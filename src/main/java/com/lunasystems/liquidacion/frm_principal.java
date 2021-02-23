@@ -16,6 +16,7 @@ import vistas.frm_ver_clientes;
 import vistas.frm_ver_jornaleros;
 import vistas.frm_ver_jornaldia;
 import vistas.frm_ver_cortadores;
+import vistas.frm_ver_envasadobarriles;
 import vistas.frm_ver_jornal_sincuenta;
 import vistas.frm_ver_parametros;
 
@@ -71,6 +72,7 @@ public class frm_principal extends javax.swing.JFrame {
         jButton9 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
@@ -180,6 +182,18 @@ public class frm_principal extends javax.swing.JFrame {
         });
         jToolBar1.add(jButton4);
 
+        jButton10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Road-Worker-1_379437.png"))); // NOI18N
+        jButton10.setText("Jornal Envasado");
+        jButton10.setFocusable(false);
+        jButton10.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton10.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton10ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton10);
+
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_37_SEO_Report_1688840.png"))); // NOI18N
         jButton5.setText("Liquidacion");
         jButton5.setFocusable(false);
@@ -243,7 +257,7 @@ public class frm_principal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(jLabel5))
-                .addContainerGap(191, Short.MAX_VALUE))
+                .addContainerGap(106, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -336,6 +350,11 @@ public class frm_principal extends javax.swing.JFrame {
         c_varios.llamar_ventana(formulario);
     }//GEN-LAST:event_jButton9ActionPerformed
 
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+         frm_ver_envasadobarriles formulario = new frm_ver_envasadobarriles();
+        c_varios.llamar_ventana(formulario);
+    }//GEN-LAST:event_jButton10ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -374,6 +393,7 @@ public class frm_principal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

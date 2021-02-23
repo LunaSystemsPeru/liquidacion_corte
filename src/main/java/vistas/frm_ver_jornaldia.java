@@ -85,52 +85,62 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
         };
         modelo.addColumn("Item");               //0
         modelo.addColumn("Nombre");             //1
-        modelo.addColumn("Cargo");              //2
-        modelo.addColumn("S/ x Dia");           //3
-        modelo.addColumn("S/ x Hora");          //4 
-        modelo.addColumn("Hora Entrada");       //5
-        modelo.addColumn("Hora Salida");        //6
-        modelo.addColumn("Total Horas");        //7
-        modelo.addColumn("Reintegro");            //8
-        modelo.addColumn("Descuento");            //8
-        modelo.addColumn("a Pagar");            //8
-        modelo.addColumn("Fecha");              //9
-        modelo.addColumn("Tipo Jornada");       //10
-        modelo.addColumn("");                   //11
-        modelo.addColumn("");                   //12
+        modelo.addColumn("Fecha");              //2
+        modelo.addColumn("Cargo");              //3
+        modelo.addColumn("S/ x Dia");           //4
+        modelo.addColumn("S/ x Hora");          //5 
+        modelo.addColumn("Hora Entrada");       //6
+        modelo.addColumn("Hora Salida");        //7
+        modelo.addColumn("Total Horas");        //8
+        modelo.addColumn("Reintegro");          //9
+        modelo.addColumn("Descuento");          //10
+        modelo.addColumn("a Pagar");            //11
+        modelo.addColumn("Tipo Jornada");       //12
         modelo.addColumn("");                   //13
         modelo.addColumn("");                   //14
+        modelo.addColumn("");                   //15
+        modelo.addColumn("");                   //16
         tbl_jornaleros.setModel(modelo);
         tbl_jornaleros.getColumnModel().getColumn(0).setPreferredWidth(30);
-        tbl_jornaleros.getColumnModel().getColumn(1).setPreferredWidth(350);
-        tbl_jornaleros.getColumnModel().getColumn(2).setPreferredWidth(150);
-        tbl_jornaleros.getColumnModel().getColumn(3).setPreferredWidth(50);
+        tbl_jornaleros.getColumnModel().getColumn(1).setPreferredWidth(300);
+        tbl_jornaleros.getColumnModel().getColumn(2).setPreferredWidth(90);
+        tbl_jornaleros.getColumnModel().getColumn(3).setPreferredWidth(130);
         tbl_jornaleros.getColumnModel().getColumn(4).setPreferredWidth(50);
-        tbl_jornaleros.getColumnModel().getColumn(5).setPreferredWidth(100);
-        tbl_jornaleros.getColumnModel().getColumn(6).setPreferredWidth(100);
+        tbl_jornaleros.getColumnModel().getColumn(5).setPreferredWidth(50);
+        tbl_jornaleros.getColumnModel().getColumn(6).setPreferredWidth(80);
         tbl_jornaleros.getColumnModel().getColumn(7).setPreferredWidth(80);
-        tbl_jornaleros.getColumnModel().getColumn(8).setPreferredWidth(70);
-        tbl_jornaleros.getColumnModel().getColumn(9).setPreferredWidth(100);
-        tbl_jornaleros.getColumnModel().getColumn(10).setPreferredWidth(100);
-        tbl_jornaleros.getColumnModel().getColumn(11).setPreferredWidth(100);
-        tbl_jornaleros.getColumnModel().getColumn(12).setPreferredWidth(100);
-        tbl_jornaleros.getColumnModel().getColumn(13).setPreferredWidth(00);
-        tbl_jornaleros.getColumnModel().getColumn(14).setPreferredWidth(00);
-        tbl_jornaleros.getColumnModel().getColumn(15).setPreferredWidth(00);
-        tbl_jornaleros.getColumnModel().getColumn(16).setPreferredWidth(00);
+        tbl_jornaleros.getColumnModel().getColumn(8).setPreferredWidth(80);
+        tbl_jornaleros.getColumnModel().getColumn(9).setPreferredWidth(60);
+        tbl_jornaleros.getColumnModel().getColumn(10).setPreferredWidth(60);
+        tbl_jornaleros.getColumnModel().getColumn(11).setPreferredWidth(70);
+        tbl_jornaleros.getColumnModel().getColumn(12).setPreferredWidth(120);
+        tbl_jornaleros.getColumnModel().getColumn(13).setMaxWidth(0);
+        tbl_jornaleros.getColumnModel().getColumn(13).setMinWidth(0);
+        tbl_jornaleros.getColumnModel().getColumn(14).setMaxWidth(0);
+        tbl_jornaleros.getColumnModel().getColumn(14).setMinWidth(0);
+        tbl_jornaleros.getColumnModel().getColumn(15).setMaxWidth(0);
+        tbl_jornaleros.getColumnModel().getColumn(15).setMinWidth(0);
+        tbl_jornaleros.getColumnModel().getColumn(16).setMaxWidth(0);
+        tbl_jornaleros.getColumnModel().getColumn(16).setMinWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(13).setMaxWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(13).setMinWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(14).setMaxWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(14).setMinWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(15).setMaxWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(15).setMinWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(16).setMaxWidth(0);
+        tbl_jornaleros.getTableHeader().getColumnModel().getColumn(16).setMinWidth(0);
         varios.centrar_celda(tbl_jornaleros, 0);
         varios.centrar_celda(tbl_jornaleros, 2);
-        varios.centrar_celda(tbl_jornaleros, 5);
         varios.centrar_celda(tbl_jornaleros, 6);
-        varios.centrar_celda(tbl_jornaleros, 9);
-        varios.centrar_celda(tbl_jornaleros, 10);
         varios.centrar_celda(tbl_jornaleros, 7);
-        varios.derecha_celda(tbl_jornaleros, 8);
-        varios.derecha_celda(tbl_jornaleros, 3);
-        varios.derecha_celda(tbl_jornaleros, 4);
+        varios.centrar_celda(tbl_jornaleros, 8);
+        varios.derecha_celda(tbl_jornaleros, 9);
+        varios.derecha_celda(tbl_jornaleros, 10);
+        varios.derecha_celda(tbl_jornaleros, 11);
 
     }
-    
+
     private void cargarJornaleros() {
         try {
             if (tac_jornaleros != null) {
@@ -170,7 +180,6 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
             System.out.println(e.getLocalizedMessage());
         }
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -363,7 +372,7 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
 
         jTextField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
-        jLabel5.setText("Pago a Jornaleros");
+        jLabel5.setText("por Pagar");
 
         jTextField2.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
@@ -497,8 +506,9 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
         jTextField1.setText(contarfilas + "");
         double sumapago = 0;
         for (int i = 0; i < contarfilas; i++) {
-            sumapago += (Double.parseDouble(tbl_jornaleros.getValueAt(i, 10).toString()));
+            sumapago += (Double.parseDouble(tbl_jornaleros.getValueAt(i, 11).toString()));
         }
+        jLabel4.setText("Nro de jornaleros. ");
         jTextField2.setText(varios.formato_totales(sumapago));
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -526,8 +536,9 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
         jTextField1.setText(contarfilas + "");
         double sumapago = 0;
         for (int i = 0; i < contarfilas; i++) {
-            sumapago += (Double.parseDouble(tbl_jornaleros.getValueAt(i, 10).toString()));
+            sumapago += (Double.parseDouble(tbl_jornaleros.getValueAt(i, 11).toString()));
         }
+        jLabel4.setText("Dias Asistencia. ");
         jTextField2.setText(varios.formato_totales(sumapago));
     }//GEN-LAST:event_jButton7ActionPerformed
 

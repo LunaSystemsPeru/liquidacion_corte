@@ -387,6 +387,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="cbx_tipo_jornal" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Component id="cbx_sinhoras" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="jButton6" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
                               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
@@ -432,11 +434,12 @@
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="jLabel2" min="-2" pref="30" max="-2" attributes="0"/>
                   <Component id="dt_fecha" min="-2" pref="30" max="-2" attributes="0"/>
-                  <Component id="jButton6" alignment="0" min="-2" pref="30" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jButton1" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                       <Component id="jLabel9" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                       <Component id="cbx_tipo_jornal" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="jButton6" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="cbx_sinhoras" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -466,7 +469,7 @@
                   <Component id="jButton7" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="354" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="358" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -770,7 +773,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel10">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Reintegro:"/>
+        <Property name="text" type="java.lang.String" value="Adicional:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextField1">
@@ -787,6 +790,11 @@
       <Events>
         <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTextField2KeyPressed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="cbx_sinhoras">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Sin Horas"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

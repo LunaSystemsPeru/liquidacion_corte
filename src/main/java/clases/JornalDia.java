@@ -274,24 +274,24 @@ public class JornalDia {
                 Object fila[] = new Object[17];
                 fila[0] = nrofila;
                 fila[1] = rs.getString("datos");
-                fila[2] = rs.getString("cargo");
+                fila[2] = varios.fecha_usuario(rs.getString("fecha"));
+                fila[3] = rs.getString("cargo");
                 if (diapago > 0) {
-                    fila[3] = varios.formato_numero(diapago);
-                } else {
-                    fila[3] = "";
-                }
-                if (horapago > 0) {
-                    fila[4] = varios.formato_numero(horapago);
+                    fila[4] = varios.formato_numero(diapago);
                 } else {
                     fila[4] = "";
                 }
-                fila[5] = horainicio;
-                fila[6] = horasalida;
-                fila[7] = varios.formato_numero(horas);
-                fila[8] = varios.formato_numero(dreintegro);
-                fila[9] = varios.formato_numero(ddescuento);
-                fila[10] = varios.formato_numero(pagototal);
-                fila[11] = varios.fecha_usuario(rs.getString("fecha"));
+                if (horapago > 0) {
+                    fila[5] = varios.formato_numero(horapago);
+                } else {
+                    fila[5] = "";
+                }
+                fila[6] = horainicio;
+                fila[7] = horasalida;
+                fila[8] = varios.formato_numero(horas);
+                fila[9] = varios.formato_numero(dreintegro);
+                fila[10] = varios.formato_numero(ddescuento);
+                fila[11] = varios.formato_numero(pagototal);
                 fila[12] = rs.getString("tipojornal");
                 fila[13] = rs.getInt("idcargo");
                 fila[14] = rs.getInt("idjornal");
@@ -349,24 +349,24 @@ public class JornalDia {
                 Object fila[] = new Object[17];
                 fila[0] = nrofila;
                 fila[1] = rs.getString("datos");
-                fila[2] = rs.getString("cargo");
+                fila[2] = varios.fecha_usuario(fecha);
+                fila[3] = rs.getString("cargo");
                 if (diapago > 0) {
-                    fila[3] = varios.formato_numero(diapago);
-                } else {
-                    fila[3] = "";
-                }
-                if (horapago > 0) {
-                    fila[4] = varios.formato_numero(horapago);
+                    fila[4] = varios.formato_numero(diapago);
                 } else {
                     fila[4] = "";
                 }
-                fila[5] = horainicio;
-                fila[6] = horasalida;
-                fila[7] = varios.formato_numero(horas);
-                fila[8] = varios.formato_numero(dreintegro);
-                fila[9] = varios.formato_numero(ddescuento);
-                fila[10] = varios.formato_numero(pagototal);
-                fila[11] = varios.fecha_usuario(fecha);
+                if (horapago > 0) {
+                    fila[5] = varios.formato_numero(horapago);
+                } else {
+                    fila[5] = "";
+                }
+                fila[6] = horainicio;
+                fila[7] = horasalida;
+                fila[8] = varios.formato_numero(horas);
+                fila[9] = varios.formato_numero(dreintegro);
+                fila[10] = varios.formato_numero(ddescuento);
+                fila[11] = varios.formato_numero(pagototal);
                 fila[12] = rs.getString("tipojornal");
                 fila[13] = rs.getInt("idcargo");
                 fila[14] = rs.getInt("idjornal");

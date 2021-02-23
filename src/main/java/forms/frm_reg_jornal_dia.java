@@ -107,16 +107,16 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         };
         modelo.addColumn("Item");               //0
         modelo.addColumn("Nombre");             //1
-        modelo.addColumn("Cargo");              //2
-        modelo.addColumn("S/ x Dia");           //3
-        modelo.addColumn("S/ x Hora");          //4 
-        modelo.addColumn("Hora Entrada");       //5
-        modelo.addColumn("Hora Salida");        //6
-        modelo.addColumn("Total Horas");        //7
-        modelo.addColumn("Reintegro");          //8
-        modelo.addColumn("Descuento");          //9
-        modelo.addColumn("a Pagar");            //10
-        modelo.addColumn("Fecha");              //11
+        modelo.addColumn("Fecha");              //2
+        modelo.addColumn("Cargo");              //3
+        modelo.addColumn("S/ x Dia");           //4
+        modelo.addColumn("S/ x Hora");          //5 
+        modelo.addColumn("Hora Entrada");       //6
+        modelo.addColumn("Hora Salida");        //7
+        modelo.addColumn("Total Horas");        //8
+        modelo.addColumn("Reintegro");          //9
+        modelo.addColumn("Descuento");          //10
+        modelo.addColumn("a Pagar");            //11
         modelo.addColumn("Tipo Jornada");       //12
         modelo.addColumn("");                   //13
         modelo.addColumn("");                   //14
@@ -126,32 +126,42 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<>(modelo);
         jTable1.setRowSorter(elQueOrdena);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(30);
-        jTable1.getColumnModel().getColumn(1).setPreferredWidth(350);
-        jTable1.getColumnModel().getColumn(2).setPreferredWidth(150);
-        jTable1.getColumnModel().getColumn(3).setPreferredWidth(80);
-        jTable1.getColumnModel().getColumn(4).setPreferredWidth(80);
-        jTable1.getColumnModel().getColumn(5).setPreferredWidth(100);
-        jTable1.getColumnModel().getColumn(6).setPreferredWidth(100);
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(300);
+        jTable1.getColumnModel().getColumn(2).setPreferredWidth(90);
+        jTable1.getColumnModel().getColumn(3).setPreferredWidth(130);
+        jTable1.getColumnModel().getColumn(4).setPreferredWidth(50);
+        jTable1.getColumnModel().getColumn(5).setPreferredWidth(50);
+        jTable1.getColumnModel().getColumn(6).setPreferredWidth(80);
         jTable1.getColumnModel().getColumn(7).setPreferredWidth(80);
         jTable1.getColumnModel().getColumn(8).setPreferredWidth(80);
-        jTable1.getColumnModel().getColumn(9).setPreferredWidth(100);
-        jTable1.getColumnModel().getColumn(10).setPreferredWidth(100);
-        jTable1.getColumnModel().getColumn(11).setPreferredWidth(100);
-        jTable1.getColumnModel().getColumn(12).setPreferredWidth(100);
-        jTable1.getColumnModel().getColumn(13).setPreferredWidth(00);
-        jTable1.getColumnModel().getColumn(14).setPreferredWidth(00);
-        jTable1.getColumnModel().getColumn(15).setPreferredWidth(00);
-        jTable1.getColumnModel().getColumn(16).setPreferredWidth(00);
+        jTable1.getColumnModel().getColumn(9).setPreferredWidth(60);
+        jTable1.getColumnModel().getColumn(10).setPreferredWidth(60);
+        jTable1.getColumnModel().getColumn(11).setPreferredWidth(70);
+        jTable1.getColumnModel().getColumn(12).setPreferredWidth(120);
+        jTable1.getColumnModel().getColumn(13).setMaxWidth(0);
+        jTable1.getColumnModel().getColumn(13).setMinWidth(0);
+        jTable1.getColumnModel().getColumn(14).setMaxWidth(0);
+        jTable1.getColumnModel().getColumn(14).setMinWidth(0);
+        jTable1.getColumnModel().getColumn(15).setMaxWidth(0);
+        jTable1.getColumnModel().getColumn(15).setMinWidth(0);
+        jTable1.getColumnModel().getColumn(16).setMaxWidth(0);
+        jTable1.getColumnModel().getColumn(16).setMinWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(13).setMaxWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(13).setMinWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(14).setMaxWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(14).setMinWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(15).setMaxWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(15).setMinWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(16).setMaxWidth(0);
+        jTable1.getTableHeader().getColumnModel().getColumn(16).setMinWidth(0);
         varios.centrar_celda(jTable1, 0);
         varios.centrar_celda(jTable1, 2);
-        varios.centrar_celda(jTable1, 5);
         varios.centrar_celda(jTable1, 6);
-        varios.centrar_celda(jTable1, 9);
-        varios.centrar_celda(jTable1, 10);
         varios.centrar_celda(jTable1, 7);
-        varios.derecha_celda(jTable1, 8);
-        varios.derecha_celda(jTable1, 3);
-        varios.derecha_celda(jTable1, 4);
+        varios.centrar_celda(jTable1, 8);
+        varios.derecha_celda(jTable1, 9);
+        varios.derecha_celda(jTable1, 10);
+        varios.derecha_celda(jTable1, 11);
 
     }
 
@@ -179,8 +189,8 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
             tac_jornaleros.setMode(0);
             tac_jornaleros.setCaseSensitive(false);
             Statement st = conectar.conexion();
-            String sql = "select * from jornaleros "
-                    + "where idcliente = '" + cliente.getIdcliente() + "'";
+            String sql = "select * from jornaleros ";
+            //+ "where idcliente = '" + cliente.getIdcliente() + "'";
             ResultSet rs = conectar.consulta(st, sql);
             while (rs.next()) {
                 int iditem = rs.getInt("idjornal");
@@ -234,11 +244,22 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         jButton1.setEnabled(true);
         txt_datos_jornalero.setEnabled(true);
 
-        cbx_cargo.setEnabled(true);
-        cbx_tipo_pago.setEnabled(true);
-        txt_monto.setEnabled(true);
-        jSpinner1.setEnabled(true);
-        jSpinner2.setEnabled(true);
+        if (cbx_sinhoras.isSelected()) {
+            cbx_cargo.setEnabled(false);
+            cbx_tipo_pago.setEnabled(false);
+            txt_monto.setEnabled(false);
+            jSpinner1.setEnabled(false);
+            jSpinner2.setEnabled(false);
+        } else {
+            cbx_cargo.setEnabled(true);
+            cbx_tipo_pago.setEnabled(true);
+            txt_monto.setEnabled(true);
+            jSpinner1.setEnabled(true);
+            jSpinner2.setEnabled(true);
+        }
+
+        cbx_sinhoras.setEnabled(false);
+
         jButton7.setEnabled(true);
         dt_fecha.setEnabled(false);
         cbx_tipo_jornal.setEnabled(false);
@@ -334,6 +355,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         jTextField1 = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
+        cbx_sinhoras = new javax.swing.JCheckBox();
 
         jDialog1.setTitle("Modificar Jornal del Dia");
 
@@ -701,7 +723,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
             }
         });
 
-        jLabel10.setText("Reintegro:");
+        jLabel10.setText("Adicional:");
 
         jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -716,6 +738,8 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
                 jTextField2KeyPressed(evt);
             }
         });
+
+        cbx_sinhoras.setText("Sin Horas");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -750,6 +774,8 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
                                 .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbx_tipo_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbx_sinhoras)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton6)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -788,11 +814,12 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(dt_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(cbx_tipo_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(cbx_tipo_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cbx_sinhoras, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -817,7 +844,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
                     .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -933,6 +960,13 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
         double horas = varios.restarHoras(horainicio, horasalida);
 
+        //si esta seleccionado sin horas cambiar cargo a limpieza linea
+        if (cbx_sinhoras.isSelected()) {
+            pago_dia = 0;
+            pago_hora = 0;
+
+        }
+
         //total dia
         double pagototal = 0;
         if (tipopago == 0) {
@@ -999,8 +1033,14 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
                 txt_monto.setText(varios.formato_numero(jornal.getPago_hora()));
                 detalle.setIddetalle(jornal.getIdcargo());
                 detalle.obtenerDatos();
-                cbx_cargo.getModel().setSelectedItem(new o_combobox(detalle.getIddetalle(), detalle.getDescripcion()));
-                cbx_cargo.requestFocus();
+                if (cbx_sinhoras.isSelected()) {
+                    jTextField1.requestFocus();
+                    cbx_cargo.getModel().setSelectedItem(new o_combobox(14, "LIMPIEZA LINEA"));
+                    txt_monto.setText("0");
+                } else {
+                    cbx_cargo.getModel().setSelectedItem(new o_combobox(detalle.getIddetalle(), detalle.getDescripcion()));
+                    cbx_cargo.requestFocus();
+                }
             }
         }
 
@@ -1032,7 +1072,12 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
     private void jTextField2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField2KeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            jSpinner1.requestFocus();
+            if (cbx_sinhoras.isSelected()) {
+                jButton7.requestFocus();
+            } else {
+                jSpinner1.requestFocus();
+            }
+
         }
     }//GEN-LAST:event_jTextField2KeyPressed
 
@@ -1206,6 +1251,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox<String> cbx_cargo;
     private javax.swing.JComboBox<String> cbx_cargo_mod;
+    private javax.swing.JCheckBox cbx_sinhoras;
     private javax.swing.JComboBox<String> cbx_tipo_jornal;
     private javax.swing.JComboBox<String> cbx_tipo_pago;
     private com.toedter.calendar.JDateChooser dt_fecha;
