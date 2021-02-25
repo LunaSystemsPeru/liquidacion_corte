@@ -320,9 +320,10 @@ public class Jornal {
             modelo.addColumn("Pago Dia");
             modelo.addColumn("Pago Hora");
             modelo.addColumn("# Cuenta");
+            modelo.addColumn("Sede");
 
             while (rs.next()) {
-                Object fila[] = new Object[7];
+                Object fila[] = new Object[8];
                 fila[0] = rs.getString("idjornal");
                 fila[1] = rs.getString("datos");
                 fila[2] = rs.getString("nrodocumento");
@@ -330,6 +331,7 @@ public class Jornal {
                 fila[4] = varios.formato_numero(rs.getDouble("dia_pago"));
                 fila[5] = varios.formato_numero(rs.getDouble("hora_pago"));
                 fila[6] = rs.getString("nrocuenta");
+                fila[7] = rs.getString("sede");
                 modelo.addRow(fila);
 
             }
@@ -343,6 +345,7 @@ public class Jornal {
             tabla.getColumnModel().getColumn(4).setPreferredWidth(80);
             tabla.getColumnModel().getColumn(5).setPreferredWidth(80);
             tabla.getColumnModel().getColumn(6).setPreferredWidth(180);
+            tabla.getColumnModel().getColumn(7).setPreferredWidth(150);
             varios.centrar_celda(tabla, 0);
             varios.centrar_celda(tabla, 2);
             varios.centrar_celda(tabla, 3);

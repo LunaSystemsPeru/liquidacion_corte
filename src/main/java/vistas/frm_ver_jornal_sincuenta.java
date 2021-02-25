@@ -433,7 +433,10 @@ public class frm_ver_jornal_sincuenta extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        jornal.verSinCuentas(jTable1, "", "");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String ffechainicio = sdf.format(dt_fecha_inicio.getDate());
+        String ffechafinal = sdf.format(dt_fecha_fin.getDate());
+        jornal.verSinCuentas(jTable1, ffechainicio, ffechafinal);
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked

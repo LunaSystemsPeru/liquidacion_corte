@@ -20,10 +20,8 @@ import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.SpinnerDateModel;
 import javax.swing.table.DefaultTableModel;
@@ -31,7 +29,6 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import objects.m_tipo;
 import objects.o_autocomplete;
-import objects.o_combobox;
 
 /**
  *
@@ -520,7 +517,6 @@ public class frm_reg_jornal_envase extends javax.swing.JInternalFrame {
 
         String fechafin = varios.fecha_myql(convertFecha());
 
-        jTable1.setModel(modelo);
         if (varios.esDecimal(jTextField13.getText())) {
             precioporbarrill = Double.parseDouble(jTextField13.getText());
         } else {
@@ -538,10 +534,20 @@ public class frm_reg_jornal_envase extends javax.swing.JInternalFrame {
 
         String fechadb = varios.fecha_myql(convertFecha());
         envase.setFecha(fechadb);
-        
-        //cargar barriles
-        
+        envase.setCantbarriles(totalbarriles);
+        envase.setIdcliente(frm_principal.cliente.getIdcliente());
+        envase.setPreciobarril(precioporbarrill);
 
+        if (!envase.validarEnvase()) {
+            envase.obtenerId();
+            envase.insertar();
+        } else {
+            envasedetalle.setIdenvase(envase.getIdenvase());
+            envasedetalle.mostrarEnvasadoDia(modelo);
+            jTable1.setModel(modelo);
+        }
+
+        //cargar barriles
         //cargar empleados
         cargarJornaleros();
         txt_datos_jornalero.requestFocus();
@@ -644,7 +650,7 @@ public class frm_reg_jornal_envase extends javax.swing.JInternalFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         //seleccionar item
         envasedetalle.setIdenvase(envase.getIdenvase());
-        envasedetalle.setIdjornal(Integer.parseInt(jTable1.getValueAt(filaseleccionada, 16).toString()));
+        envasedetalle.setIdjornal(Integer.parseInt(jTable1.getValueAt(filaseleccionada, 7).toString()));
         //preguntar si eliminara
         int mensaje = JOptionPane.showConfirmDialog(null, "Realmente desea eliminar este item?", "Confirmar Eliminar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (mensaje == JOptionPane.OK_OPTION) {

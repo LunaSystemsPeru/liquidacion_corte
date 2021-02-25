@@ -29,10 +29,10 @@ public class frm_ver_jornaleros extends javax.swing.JInternalFrame {
      */
     public frm_ver_jornaleros() {
         initComponents();
-        sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.nrodocumento, j.nrocuenta, pd.descripcion as ncargo "
+        sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.nrodocumento, j.nrocuenta, pd.descripcion as ncargo, c.sede "
                 + "from jornaleros as j "
                 + "inner join parametros_detalle as pd on pd.iddetalle = j.idcargo "
-                + "where j.idcliente = '" + idcliente + "' "
+                + "inner join clientes as c on c.idcliente = j.idcliente "
                 + "order by j.datos asc";
         jornal.verFilas(jTable1, sql);
     }
@@ -181,10 +181,11 @@ public class frm_ver_jornaleros extends javax.swing.JInternalFrame {
     private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             String texto = jTextField1.getText().trim();
-            sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.nrodocumento, j.nrocuenta, pd.descripcion as ncargo "
+            sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.nrodocumento, j.nrocuenta, pd.descripcion as ncargo, c.sede "
                     + "from jornaleros as j "
                     + "inner join parametros_detalle as pd on pd.iddetalle = j.idcargo "
-                    + "where j.idcliente = '" + idcliente + "'and datos like '%" + texto + "%' "
+                    + "inner join clientes as c on c.idcliente = j.idcliente "
+                    + "where datos like '%" + texto + "%' "
                     + "order by j.datos asc";
             jornal.verFilas(jTable1, sql);
         }

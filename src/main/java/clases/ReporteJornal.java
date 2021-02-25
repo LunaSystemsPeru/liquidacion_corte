@@ -304,6 +304,258 @@ public class ReporteJornal {
         //System.out.println(sql);
     }
 
+    public void rptPagoEnvasadoentreDias(String fecini, String fecfin) {
+        SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        long diff = 0;
+        try {
+            Date date1 = myFormat.parse(fecini);
+            Date date2 = myFormat.parse(fecfin);
+            diff = date2.getTime() - date1.getTime();
+            //System.out.println("Days: " + TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        long dias = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        dias = dias + 1;
+        String subquery = "";
+
+        String[] titulos;
+        int idias = Integer.parseInt(dias + "");
+
+        titulos = new String[idias + 8];
+        titulos[0] = "Item";
+        titulos[1] = "Empleado";
+        titulos[2] = "Nro Documento";
+        titulos[3] = "Nro Cuenta";
+
+        for (int i = 0; i < dias; i++) {
+            Date fecha_temp = varios.suma_dia(fecini, i);
+            String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fecha_temp);
+            subquery += "(select ifnull(envase_detalle.idenvase, 0) "
+                    + "from envase_detalle "
+                    + "inner join envase_equitativo on envase_equitativo.idenvase = envase_detalle.idenvase "
+                    + "where envase_detalle.idjornal = ed.idjornal and envase_equitativo.fecha= '" + date + "') "
+                    + "as '" + date + "', ";
+            titulos[4 + i] = varios.fecha_usuario(date);
+        }
+
+        String sql = "select ed.idjornal, j.datos, j.nrodocumento, j.nrocuenta, "
+                + subquery
+                + "sum(ed.adicional) as sadicional, sum(ed.descuento) as sdescuento "
+                + "from envase_detalle as ed  "
+                + "inner join jornaleros as j on j.idjornal = ed.idjornal "
+                + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
+                + "where ee.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and ee.idcliente = '" + this.idcliente + "' "
+                + "group by ed.idjornal "
+                + "order by j.datos asc";
+
+        //System.out.println(sql);
+        titulos[idias + 4] = "Total Envasado";
+        titulos[idias + 5] = "Reintegro";
+        titulos[idias + 6] = "Descuentos";
+        titulos[idias + 7] = "Total a Pagar";
+        //System.out.println(Arrays.toString(titulos));
+
+        Statement st = conectar.conexion();
+        ResultSet rs = conectar.consulta(st, sql);
+
+        //ArrayList listafilas = new ArrayList();
+        ArrayList<Object> listafilas = new ArrayList<>();
+        try {
+            int nroitems = 1;
+            double sumatotal = 0;
+            Object objectfilafinal[] = new Object[idias + 8];
+            objectfilafinal[1] = "NRO DE BARRILES - SUMA TOTALES ";
+            objectfilafinal[0] = "";
+            objectfilafinal[2] = "";
+            objectfilafinal[3] = "";
+
+            while (rs.next()) {
+
+                Object objectfila[] = new Object[idias + 8];
+                double dreintegro = rs.getDouble("sadicional");
+                double ddescuento = rs.getDouble("sdescuento");
+                double sumapagobarril = 0;
+
+                for (int i = 0; i < dias; i++) {
+                    String idenvase = rs.getString(5 + i);
+                    String[] resultado;
+                    double monto = 0;
+                    int barrilesfecha = 0;
+                    if (varios.esEntero(idenvase)) {
+                        resultado = obtenerTotalBarriles(Integer.parseInt(idenvase));
+                        monto = Double.parseDouble(resultado[0]);
+                        barrilesfecha = Integer.parseInt(resultado[1] + "");
+                    }
+                    sumapagobarril += monto;
+                    objectfila[4 + i] = monto;
+                    objectfilafinal[4 + i] = barrilesfecha;
+                }
+
+                double dapagar = sumapagobarril + dreintegro - ddescuento;
+                sumatotal += dapagar;
+
+                objectfila[0] = nroitems;
+                nroitems++;
+                objectfila[1] = rs.getString("datos");
+                objectfila[2] = rs.getString("nrodocumento");
+                objectfila[3] = rs.getString("nrocuenta");
+                objectfila[idias + 4] = varios.formato_numero(sumapagobarril);
+                objectfila[idias + 5] = dreintegro;
+                objectfila[idias + 6] = ddescuento;
+                objectfila[idias + 7] = varios.formato_numero(dapagar);
+
+                listafilas.add(objectfila);
+                // System.out.println(Arrays.toString(objectfila));
+            }
+            objectfilafinal[idias + 4] = 0;
+            objectfilafinal[idias + 5] = 0;
+            objectfilafinal[idias + 6] = 0;
+            objectfilafinal[idias + 7] = varios.formato_numero(sumatotal);
+            listafilas.add(objectfilafinal);
+
+            conectar.cerrar(st);
+            conectar.cerrar(rs);
+        } catch (SQLException e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+
+        // System.out.println(Arrays.toString(titulos));
+        File dir = new File("");
+
+        String carpeta_reportes = dir.getAbsolutePath() + File.separator + "reportes";
+
+        //String nombre_archivo = carpeta_reportes + File.separator + "pesaje_" + fecha_inicio + "_hasta_" + date_final + ".xls";
+        JFileChooser guardar = new JFileChooser();
+        //guardar.showSaveDialog(null);
+
+        guardar.setDialogTitle("Seleccionar Carpeta para guardar Reporte");
+        guardar.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //guardar.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        //guardar.setName("pesaje_" + fecha_inicio + "_hasta_" + date_final + ".xls");
+        guardar.setAcceptAllFileFilterUsed(false);
+        guardar.setApproveButtonText("Sel. Carpeta ");
+
+        if (guardar.showSaveDialog(frm_principal.jTabbedPane1) == JFileChooser.APPROVE_OPTION) {
+            String carpetanueva = guardar.getSelectedFile().toString();
+            // System.out.println(carpetanueva);
+            carpeta_reportes = carpetanueva + File.separator + "jornal_envase_" + fecini + "_hasta_" + fecfin;
+        } else {
+            JOptionPane.showMessageDialog(null, "SE GUARDARA EL REPORTE EN LA CARPETA POR DEFECTO");
+            carpeta_reportes += File.separator + "jornal_envase_" + fecini + "_hasta_" + fecfin;
+        }
+
+        //   System.out.println(guardarComo());
+        /*
+        File directorio = new File(carpeta_reportes);
+        if (!directorio.exists()) {
+            if (directorio.mkdirs()) {
+                System.out.println("Directorio creado");
+            } else {
+                System.out.println("Error al crear directorio");
+            }
+        }
+         */
+        // Creamos el archivo donde almacenaremos la hoja
+        // de calculo, recuerde usar la extension correcta,
+        // en este caso .xlsx
+        String nombre_archivo = carpeta_reportes + ".xls";// + File.separator + "pesaje_" + fecha_inicio + "_hasta_" + date_final + ".xls";
+        File archivo = new File(nombre_archivo);
+        //File archivo =narchivo;
+
+        //  System.out.println(nombre_archivo);
+        // Creamos el libro de trabajo de Excel formato OOXML
+        HSSFWorkbook workbook = new HSSFWorkbook();
+
+        // La hoja donde pondremos los datos
+        HSSFSheet pagina = workbook.createSheet("Resumen");
+
+        // Creamos una fila en la hoja en la posicion 0
+        HSSFRow fila = pagina.createRow(0);
+        //System.out.println(titulos.length + " total columnas");
+
+        pagina.setColumnWidth(0, 1550);
+        pagina.setColumnWidth(1, 15000);
+        pagina.setColumnWidth(2, 4200);
+        pagina.setColumnWidth(3, 4200);
+
+        // Creamos el encabezado
+        for (int i = 0; i < titulos.length; i++) {
+            // Creamos una celda en esa fila, en la posicion 
+            // indicada por el contador del ciclo
+            HSSFCell celda = fila.createCell(i);
+
+            // Indicamos el estilo que deseamos 
+            // usar en la celda, en este caso el unico 
+            // que hemos creado
+            celda.setCellValue(titulos[i]);
+        }
+
+        //se hace el recorrido de la base de datos para cargar lo vaores en las celdas
+        HSSFCellStyle style = workbook.createCellStyle();
+        // style.setDataFormat(HSSFDataFormat.getBuiltinFormat("###0.00"));
+        style.setDataFormat(HSSFDataFormat.getBuiltinFormat("_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)"));
+
+        HSSFCellStyle stylehora = workbook.createCellStyle();
+        // style.setDataFormat(HSSFDataFormat.getBuiltinFormat("###0.00"));
+        stylehora.setDataFormat(HSSFDataFormat.getBuiltinFormat("[HH]:mm"));
+
+        int filanro = 1;
+        System.out.println(listafilas.size());
+        for (int i = 0; i < listafilas.size(); i++) {
+
+            // Ahora creamos una fila en la posicion 1
+            fila = pagina.createRow(filanro);
+            // Y colocamos los datos en esa fila
+            Object filita[] = (Object[]) listafilas.get(i);
+            //System.out.println(Arrays.toString(filita));
+            int totalcolumnas = idias + 8;
+            System.out.println(totalcolumnas + " es el total de columnas");
+
+            for (int j = 0; j < (totalcolumnas); j++) {
+                // Creamos una celda en esa fila, en la
+                // posicion indicada por el contador del ciclo
+                HSSFCell celda = fila.createCell(j);
+                System.out.println(filita[j] + " es de la fila " + j);
+
+                if (j < 4) {
+                    celda.setCellValue(filita[j] + "");
+                }
+
+                if (j > 3) {
+                    celda.setCellValue(Double.parseDouble(filita[j] + ""));
+                    celda.setCellStyle(style);
+                    celda.setCellType(NUMERIC);
+                }
+            }
+
+            filanro++;
+        }
+
+        // Ahora guardaremos el archivo
+        try {
+            FileOutputStream salida = new FileOutputStream(archivo);
+            workbook.write(salida);
+            salida.close();
+
+            System.out.println("Archivo creado existosamente en " + archivo.getAbsolutePath());
+            Notification.show("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
+
+            Desktop.getDesktop().open(new File(archivo.getAbsolutePath()));
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getLocalizedMessage());
+            System.out.println("Archivo no localizable en sistema de archivos");
+            JOptionPane.showMessageDialog(null, "ERROR AL GENERAR EL ARCHIVO \n" + ex.getLocalizedMessage());
+        } catch (IOException ex) {
+            System.out.println(ex.getLocalizedMessage());
+            System.out.println("Error de entrada/salida");
+            JOptionPane.showMessageDialog(null, "Error de entrada/salida \n" + ex.getLocalizedMessage());
+        }
+        //System.out.println(sql);
+    }
+
     private double obtenerHorasDia(int idjornal, String fecha, String hora_pago, String dia_pago) {
         double horas = 0;
         fecha = varios.fecha_myql(fecha);
@@ -326,6 +578,32 @@ public class ReporteJornal {
         }
 
         return horas;
+    }
+
+    public String[] obtenerTotalBarriles(int idenvase) {
+        String resultado[] = new String[2];
+        try {
+            Statement st = conectar.conexion();
+            String query = "select ee.cant_barriles, (ee.cant_barriles * ee.monto_pagar / COUNT(ed.idjornal)) as monto "
+                    + "from envase_equitativo as ee "
+                    + "inner join envase_detalle as ed  on ee.idenvase = ed.idenvase "
+                    + "where ee.idenvase  = '" + idenvase + "' ";
+            //System.out.println(query);
+            ResultSet rs = conectar.consulta(st, query);
+            if (rs.next()) {
+                resultado[0] = rs.getString("monto");
+                resultado[1] = rs.getString("cant_barriles");
+                /*
+                resultado[0] = rs.getDouble("monto");
+                resultado[1] = rs.getDouble("cant_barriles");
+                 */
+            }
+            conectar.cerrar(rs);
+            conectar.cerrar(st);
+        } catch (SQLException ex) {
+            System.out.println(ex.getLocalizedMessage());
+        }
+        return resultado;
     }
 
 }

@@ -112,6 +112,28 @@ public class EnvaseEquitativo {
 
         return registrado;
     }
+    
+    public boolean validarEnvase() {
+        boolean existe = false;
+        try {
+            Statement st = conectar.conexion();
+            String query = "select * from envase_equitativo "
+                    + "where fecha = '" + this.fecha + "' and idcliente = '"+this.idcliente+"' ";
+            System.out.println(query);
+            ResultSet rs = conectar.consulta(st, query);
+            if (rs.next()) {
+                existe = true;
+                this.idenvase = rs.getInt("idenvase");
+                this.cantbarriles = rs.getDouble("cant_barriles");
+                this.preciobarril = rs.getDouble("monto_pagar");
+            }
+            conectar.cerrar(rs);
+            conectar.cerrar(st);
+        } catch (SQLException ex) {
+            System.out.println(ex.getLocalizedMessage());
+        }
+        return existe;
+    }
 
     public boolean obtenerDatos() {
         boolean existe = false;
