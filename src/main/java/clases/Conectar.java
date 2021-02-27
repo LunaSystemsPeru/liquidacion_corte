@@ -19,13 +19,13 @@ public class Conectar {
 
     //private static final String url= direccion +"/pesaje_db.db";
     private static Connection conexion = null;
-    private static final String BD = "liquidacion"; // Nombre de BD.
-    private static final String USER = "root"; // Usuario de BD.
+    private static final String BD = "liquidacionvilca"; // Nombre de BD.
+    private static final String USER = "root_lsp"; // Usuario de BD.
     private static final String PASSWORD = "root/*123"; // Password de BD.
 
     // Driver para MySQL en este caso.
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    String server = "jdbc:mysql://192.168.0.6/" + BD;
+    String server = "jdbc:mysql://lunasystemsperu.com:3306/" + BD;
 
     /**
      * ***** Prueba con SQLite
