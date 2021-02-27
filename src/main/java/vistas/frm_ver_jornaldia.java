@@ -41,6 +41,7 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
 
     DefaultTableModel modelo;
     TextAutoCompleter tac_jornaleros = null;
+    int filaseleccionada;
 
     /**
      * Creates new form frm_ver_jornaldia
@@ -254,6 +255,11 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
             }
         ));
         tbl_resumen.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        tbl_resumen.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbl_resumenMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbl_resumen);
 
         jLabel7.setText("Mes:");
@@ -541,6 +547,31 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
         jLabel4.setText("Dias Asistencia. ");
         jTextField2.setText(varios.formato_totales(sumapago));
     }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void tbl_resumenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_resumenMouseClicked
+        if (evt.getClickCount() == 2) {
+            filaseleccionada = tbl_resumen.getSelectedRow();
+
+            cargarTabla();
+
+            String fechafin = tbl_resumen.getValueAt(filaseleccionada, 0).toString();
+            jornaldia.setFecha(fechafin);
+            jornaldia.setIdtipo(Integer.parseInt(tbl_resumen.getValueAt(filaseleccionada, 4).toString()));
+            jornaldia.mostrarJornalDia(modelo);
+
+            tbl_jornaleros.setModel(modelo);
+
+            int contarfilas = tbl_jornaleros.getRowCount();
+            jTextField1.setText(contarfilas + "");
+            double sumapago = 0;
+            for (int i = 0; i < contarfilas; i++) {
+                sumapago += (Double.parseDouble(tbl_jornaleros.getValueAt(i, 11).toString()));
+            }
+            jLabel4.setText("Nro de jornaleros. ");
+            jTextField2.setText(varios.formato_totales(sumapago));
+
+        }
+    }//GEN-LAST:event_tbl_resumenMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -157,6 +157,9 @@
                 </Property>
                 <Property name="autoResizeMode" type="int" value="0"/>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tbl_resumenMouseClicked"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

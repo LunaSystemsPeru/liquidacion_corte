@@ -899,16 +899,16 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         
         modelo.addColumn("Item");           //0
         modelo.addColumn("Nombre");         //1
-        modelo.addColumn("Cargo");          //2
-        modelo.addColumn("S/ x Dia");       //3
-        modelo.addColumn("S/ x Hora");      //4
-        modelo.addColumn("Hora Entrada");   //5
-        modelo.addColumn("Hora Salida");    //6
-        modelo.addColumn("Total Horas");    //7
-        modelo.addColumn("Reintegro");      //8
-        modelo.addColumn("Descuento");      //9
-        modelo.addColumn("a Pagar");        //10
-        modelo.addColumn("Fecha");          //11
+        modelo.addColumn("Fecha");          //2
+        modelo.addColumn("Cargo");          //3
+        modelo.addColumn("S/ x Dia");       //4
+        modelo.addColumn("S/ x Hora");      //5
+        modelo.addColumn("Hora Entrada");   //6
+        modelo.addColumn("Hora Salida");    //7
+        modelo.addColumn("Total Horas");    //8
+        modelo.addColumn("Reintegro");      //9
+        modelo.addColumn("Descuento");      //10
+        modelo.addColumn("a Pagar");        //11
         modelo.addColumn("Tipo Jornada");   //12
         modelo.addColumn("idcargo");        //13
         modelo.addColumn("idempleado");     //14
@@ -1004,16 +1004,16 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         Object fila[] = new Object[17];
         fila[0] = nrofila + 1;
         fila[1] = jornal.getDatos();
-        fila[2] = ocargo.getTexto();
-        fila[3] = varios.formato_numero(pago_dia);
-        fila[4] = varios.formato_numero(pago_hora);
-        fila[5] = horainicio;
-        fila[6] = horasalida;
-        fila[7] = varios.formato_numero(horas);
-        fila[8] = varios.formato_numero(reintegro);
-        fila[9] = varios.formato_numero(descuento);
-        fila[10] = varios.formato_numero(pagototal);
-        fila[11] = fecha;
+        fila[2] = fecha;
+        fila[3] = ocargo.getTexto();
+        fila[4] = varios.formato_numero(pago_dia);
+        fila[5] = varios.formato_numero(pago_hora);
+        fila[6] = horainicio;
+        fila[7] = horasalida;
+        fila[8] = varios.formato_numero(horas);
+        fila[9] = varios.formato_numero(reintegro);
+        fila[10] = varios.formato_numero(descuento);
+        fila[11] = varios.formato_numero(pagototal);
         fila[12] = otipojornal.getTexto();
         fila[13] = ocargo.getId();
         fila[14] = jornal.getIdjornal();
@@ -1122,23 +1122,23 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
         jTextField4.setText(jTable1.getValueAt(filaseleccionada, 1).toString());
         double pago = 0;
-        if (jTable1.getValueAt(filaseleccionada, 3).toString().equals("")) {
+        if (jTable1.getValueAt(filaseleccionada, 4).toString().equals("")) {
             pago = 0;
         } else {
-            pago = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 3).toString());
+            pago = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 4).toString());
         }
 
         jRadioButton1.setSelected(true);
         if (pago == 0) {
-            pago = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 4).toString());
+            pago = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 5).toString());
             jRadioButton2.setSelected(true);
         }
 
         jSpinner3.getModel();
         //String horainicio = new SimpleDateFormat("HH:mm").format(jSpinner1.getValue());
         try {
-            String timeinicio = jTable1.getValueAt(filaseleccionada, 5).toString();
-            String timefinal = jTable1.getValueAt(filaseleccionada, 6).toString();
+            String timeinicio = jTable1.getValueAt(filaseleccionada, 6).toString();
+            String timefinal = jTable1.getValueAt(filaseleccionada, 7).toString();
 
             DateFormat sdf = new SimpleDateFormat("HH:mm a"); // or "hh:mm" for 12 hour format
             Date dateinicio = sdf.parse(timeinicio);
@@ -1150,10 +1150,10 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
             System.out.println(e.getLocalizedMessage());
         }
 
-        jTextField8.setText(jTable1.getValueAt(filaseleccionada, 7).toString());
-        jTextField6.setText(jTable1.getValueAt(filaseleccionada, 8).toString());
-        jTextField7.setText(jTable1.getValueAt(filaseleccionada, 9).toString());
-        jTextField9.setText(jTable1.getValueAt(filaseleccionada, 10).toString());
+        jTextField8.setText(jTable1.getValueAt(filaseleccionada, 8).toString());
+        jTextField6.setText(jTable1.getValueAt(filaseleccionada, 9).toString());
+        jTextField7.setText(jTable1.getValueAt(filaseleccionada, 10).toString());
+        jTextField9.setText(jTable1.getValueAt(filaseleccionada, 11).toString());
 
         detalle.setIddetalle(Integer.parseInt(jTable1.getValueAt(filaseleccionada, 13).toString()));
         detalle.obtenerDatos();

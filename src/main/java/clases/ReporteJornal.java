@@ -304,6 +304,220 @@ public class ReporteJornal {
         //System.out.println(sql);
     }
 
+    public void rptPagoJornalsinHoras(String fecini, String fecfin) {
+        SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        long diff = 0;
+        try {
+            Date date1 = myFormat.parse(fecini);
+            Date date2 = myFormat.parse(fecfin);
+            diff = date2.getTime() - date1.getTime();
+            //System.out.println("Days: " + TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        long dias = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        dias = dias + 1;
+        String subquery = "";
+
+        String[] titulos;
+        int idias = Integer.parseInt(dias + "");
+
+        titulos = new String[idias + 5];
+        titulos[0] = "Item";
+        titulos[1] = "Empleado";
+        titulos[2] = "Nro Documento";
+        titulos[3] = "Nro Cuenta";
+
+        for (int i = 0; i < dias; i++) {
+            Date fecha_temp = varios.suma_dia(fecini, i);
+            String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fecha_temp);
+
+            subquery += " IFNULL((select (reintegro - descuento) "
+                    + "FROM jornal_dia "
+                    + "WHERE idjornal = jd.idjornal AND fecha = '" + date + "' and idtipo = jd.idtipo),0) as '" + date + "', ";
+
+            titulos[4 + i] = varios.fecha_usuario(date);
+        }
+
+        String sql = "SELECT jd.idjornal, j.datos, j.nrodocumento,  "
+                + subquery
+                + "j.nrocuenta "
+                + "from jornal_dia as jd "
+                + "inner join jornaleros as j on j.idjornal = jd.idjornal "
+                + "where jd.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and jd.idcliente = '" + this.idcliente + "' and jd.idtipo = '" + this.idtipo + "'  "
+                + "GROUP by jd.idjornal "
+                + "order by datos asc";
+
+       // System.out.println(sql);
+
+        titulos[idias + 4] = "Total a Pagar";
+
+        Statement st = conectar.conexion();
+        ResultSet rs = conectar.consulta(st, sql);
+        //ArrayList listafilas = new ArrayList();
+        ArrayList<Object> listafilas = new ArrayList<>();
+        try {
+            int nroitems = 1;
+
+            while (rs.next()) {
+                Object objectfila[] = new Object[idias + 5];
+                int iidjornal = rs.getInt("idjornal");
+
+                double dapagar = 0;
+
+                objectfila[0] = nroitems;
+                nroitems++;
+                objectfila[1] = rs.getString("datos");
+                objectfila[2] = rs.getString("nrodocumento");
+                objectfila[3] = rs.getString("nrocuenta");
+
+                for (int j = 4; j < idias+4; j++) {
+                    
+                    if (varios.esDecimal(rs.getString(j))) {
+                        objectfila[j ] = rs.getDouble(j);
+                        dapagar += rs.getDouble(j);
+                    } else {
+                        objectfila[j ] = 0;
+                    }
+
+                }
+                objectfila[idias + 4] = dapagar;
+                System.out.println("item " + idias + 4 + " valor = " + objectfila[idias + 4].toString());
+
+                listafilas.add(objectfila);
+                System.out.println(Arrays.toString(objectfila));
+            }
+            conectar.cerrar(st);
+            conectar.cerrar(rs);
+        } catch (SQLException e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+
+        // System.out.println(Arrays.toString(titulos));
+        File dir = new File("");
+
+        String carpeta_reportes = dir.getAbsolutePath() + File.separator + "reportes";
+
+        //String nombre_archivo = carpeta_reportes + File.separator + "pesaje_" + fecha_inicio + "_hasta_" + date_final + ".xls";
+        JFileChooser guardar = new JFileChooser();
+        //guardar.showSaveDialog(null);
+
+        guardar.setDialogTitle("Seleccionar Carpeta para guardar Reporte");
+        guardar.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //guardar.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        //guardar.setName("pesaje_" + fecha_inicio + "_hasta_" + date_final + ".xls");
+        guardar.setAcceptAllFileFilterUsed(false);
+        guardar.setApproveButtonText("Sel. Carpeta ");
+
+        if (guardar.showSaveDialog(frm_principal.jTabbedPane1) == JFileChooser.APPROVE_OPTION) {
+            String carpetanueva = guardar.getSelectedFile().toString();
+            // System.out.println(carpetanueva);
+            carpeta_reportes = carpetanueva + File.separator + "jornal_solomonto_" + fecini + "_hasta_" + fecfin;
+        } else {
+            JOptionPane.showMessageDialog(null, "SE GUARDARA EL REPORTE EN LA CARPETA POR DEFECTO");
+            carpeta_reportes += File.separator + "jornal_solomonto_" + fecini + "_hasta_" + fecfin;
+        }
+
+        //   System.out.println(guardarComo());
+        // Creamos el archivo donde almacenaremos la hoja
+        // de calculo, recuerde usar la extension correcta,
+        // en este caso .xlsx
+        String nombre_archivo = carpeta_reportes + ".xls";// + File.separator + "pesaje_" + fecha_inicio + "_hasta_" + date_final + ".xls";
+        File archivo = new File(nombre_archivo);
+        //File archivo =narchivo;
+
+        //  System.out.println(nombre_archivo);
+        // Creamos el libro de trabajo de Excel formato OOXML
+        HSSFWorkbook workbook = new HSSFWorkbook();
+
+        // La hoja donde pondremos los datos
+        HSSFSheet pagina = workbook.createSheet("Resumen");
+
+        // Creamos una fila en la hoja en la posicion 0
+        HSSFRow fila = pagina.createRow(0);
+        //System.out.println(titulos.length + " total columnas");
+
+        pagina.setColumnWidth(0, 1550);
+        pagina.setColumnWidth(1, 15000);
+        pagina.setColumnWidth(2, 4200);
+        pagina.setColumnWidth(3, 4200);
+
+        // Creamos el encabezado
+        for (int i = 0; i < titulos.length; i++) {
+            // Creamos una celda en esa fila, en la posicion 
+            // indicada por el contador del ciclo
+            HSSFCell celda = fila.createCell(i);
+
+            // Indicamos el estilo que deseamos 
+            // usar en la celda, en este caso el unico 
+            // que hemos creado
+            celda.setCellValue(titulos[i]);
+        }
+
+        //se hace el recorrido de la base de datos para cargar lo vaores en las celdas
+        HSSFCellStyle style = workbook.createCellStyle();
+        // style.setDataFormat(HSSFDataFormat.getBuiltinFormat("###0.00"));
+        style.setDataFormat(HSSFDataFormat.getBuiltinFormat("_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)"));
+
+        HSSFCellStyle stylehora = workbook.createCellStyle();
+        // style.setDataFormat(HSSFDataFormat.getBuiltinFormat("###0.00"));
+        stylehora.setDataFormat(HSSFDataFormat.getBuiltinFormat("[HH]:mm"));
+
+        int filanro = 1;
+        //    System.out.println(listafilas.size());
+        for (int i = 0; i < listafilas.size(); i++) {
+
+            // Ahora creamos una fila en la posicion 1
+            fila = pagina.createRow(filanro);
+            // Y colocamos los datos en esa fila
+            Object filita[] = (Object[]) listafilas.get(i);
+            //System.out.println(Arrays.toString(filita));
+            int totalcolumnas = idias + 5;
+
+            for (int j = 0; j < (totalcolumnas); j++) {
+                // Creamos una celda en esa fila, en la
+                // posicion indicada por el contador del ciclo
+                HSSFCell celda = fila.createCell(j);
+
+                if (j < 4) {
+                    celda.setCellValue(filita[j] + "");
+                }
+
+                if (j > 3 && j < totalcolumnas ) {
+                    celda.setCellValue((double) filita[j]);
+                    celda.setCellStyle(style);
+                    celda.setCellType(NUMERIC);
+                }
+
+            }
+
+            filanro++;
+        }
+        // Ahora guardaremos el archivo
+        try {
+            FileOutputStream salida = new FileOutputStream(archivo);
+            workbook.write(salida);
+            salida.close();
+
+            System.out.println("Archivo creado existosamente en " + archivo.getAbsolutePath());
+            Notification.show("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
+
+            Desktop.getDesktop().open(new File(archivo.getAbsolutePath()));
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.getLocalizedMessage());
+            System.out.println("Archivo no localizable en sistema de archivos");
+            JOptionPane.showMessageDialog(null, "ERROR AL GENERAR EL ARCHIVO \n" + ex.getLocalizedMessage());
+        } catch (IOException ex) {
+            System.out.println(ex.getLocalizedMessage());
+            System.out.println("Error de entrada/salida");
+            JOptionPane.showMessageDialog(null, "Error de entrada/salida \n" + ex.getLocalizedMessage());
+        }
+        //System.out.println(sql);
+          
+    }
+
     public void rptPagoEnvasadoentreDias(String fecini, String fecfin) {
         SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -503,7 +717,7 @@ public class ReporteJornal {
         stylehora.setDataFormat(HSSFDataFormat.getBuiltinFormat("[HH]:mm"));
 
         int filanro = 1;
-        System.out.println(listafilas.size());
+      //  System.out.println(listafilas.size());
         for (int i = 0; i < listafilas.size(); i++) {
 
             // Ahora creamos una fila en la posicion 1
@@ -512,13 +726,13 @@ public class ReporteJornal {
             Object filita[] = (Object[]) listafilas.get(i);
             //System.out.println(Arrays.toString(filita));
             int totalcolumnas = idias + 8;
-            System.out.println(totalcolumnas + " es el total de columnas");
+          //  System.out.println(totalcolumnas + " es el total de columnas");
 
             for (int j = 0; j < (totalcolumnas); j++) {
                 // Creamos una celda en esa fila, en la
                 // posicion indicada por el contador del ciclo
                 HSSFCell celda = fila.createCell(j);
-                System.out.println(filita[j] + " es de la fila " + j);
+               // System.out.println(filita[j] + " es de la fila " + j);
 
                 if (j < 4) {
                     celda.setCellValue(filita[j] + "");

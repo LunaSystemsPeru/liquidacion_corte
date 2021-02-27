@@ -395,12 +395,13 @@ public class JornalDia {
         modelo.addColumn("Tipo Jornal");
         modelo.addColumn("Nro Jornaleros");
         modelo.addColumn("Total S/");
+        modelo.addColumn(""); //idtipo
 
-        String sql = "select jd.fecha, pd.descripcion, count(jd.idjornal) as nrojornaleros "
+        String sql = "select jd.fecha, pd.descripcion, count(jd.idjornal) as nrojornaleros, jd.idtipo "
                 + "from jornal_dia as jd "
                 + "inner join parametros_detalle as pd on pd.iddetalle = jd.idtipo "
                 + "where month(jd.fecha) = '" + mes + "' and year(jd.fecha) = '" + anio + "' and jd.idcliente = '" + this.idcliente + "' "
-                + "group by jd.fecha ";
+                + "group by jd.fecha, jd.idtipo ";
         try {
             Statement st = conectar.conexion();
             ResultSet rs = conectar.consulta(st, sql);
@@ -409,11 +410,12 @@ public class JornalDia {
             while (rs.next()) {
                 nrofila++;
 
-                Object fila[] = new Object[4];
+                Object fila[] = new Object[5];
                 fila[0] = rs.getString("fecha");
                 fila[1] = rs.getString("descripcion");
                 fila[2] = rs.getString("nrojornaleros");
                 fila[3] = "";
+                fila[4] = rs.getInt("idtipo");
                 modelo.addRow(fila);
 
             }
@@ -425,6 +427,7 @@ public class JornalDia {
             tabla.getColumnModel().getColumn(1).setPreferredWidth(100);
             tabla.getColumnModel().getColumn(2).setPreferredWidth(50);
             tabla.getColumnModel().getColumn(3).setPreferredWidth(70);
+            tabla.getColumnModel().getColumn(4).setPreferredWidth(0);
         } catch (SQLException e) {
             System.out.print(e);
         }
