@@ -18,7 +18,7 @@ public class Liquidacion {
             /*JFrame.setDefaultLookAndFeelDecorated(true);
             JDialog.setDefaultLookAndFeelDecorated(true);
            // SubstanceLookAndFeel.setSkin("org.pushingpixels.substance.api.skin.BusinessBlackSteelSkin");*/
-            frm_principal formulario = new frm_principal();
+            frm_login formulario = new frm_login();
             formulario.setLocationRelativeTo(null);
             formulario.setVisible(true);
         } catch (Exception e) {

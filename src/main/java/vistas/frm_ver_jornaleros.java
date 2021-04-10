@@ -197,6 +197,7 @@ public class frm_ver_jornaleros extends javax.swing.JInternalFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         Frame f = JOptionPane.getRootFrame();
+        frm_reg_jornalero.jornal.setIdjornal(0);
         frm_reg_jornalero dialog = new frm_reg_jornalero(f, true);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);

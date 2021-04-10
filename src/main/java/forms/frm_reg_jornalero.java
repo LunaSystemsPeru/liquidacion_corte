@@ -92,6 +92,7 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     }
 
     private void limpiar() {
+        jornal.setIdjornal(0);
         jTextField2.setText("");
         jTextField3.setText("");
         jTextField1.setText("");

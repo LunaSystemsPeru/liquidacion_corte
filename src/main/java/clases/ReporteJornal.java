@@ -775,7 +775,7 @@ public class ReporteJornal {
         fecha = varios.fecha_myql(fecha);
         String sql_hora = "select jd.hora_inicio, jd.hora_salida "
                 + "from jornal_dia as jd "
-                + "where jd.fecha = '" + fecha + "' and jd.idjornal = '" + idjornal + "' and jd.hora_pago = '" + hora_pago + "' and jd.dia_pago = '" + dia_pago + "' ";
+                + "where jd.fecha = '" + fecha + "' and jd.idjornal = '" + idjornal + "' and jd.hora_pago = '" + hora_pago + "' and jd.dia_pago = '" + dia_pago + "' and jd.idcliente = '"+this.idcliente+"' ";
         // System.out.println(sql_hora);
         Statement st = conectar.conexion();
         ResultSet rs = conectar.consulta(st, sql_hora);

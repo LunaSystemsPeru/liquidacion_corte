@@ -41,9 +41,13 @@ public class frm_principal extends javax.swing.JFrame {
     public frm_principal() {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         initComponents();
-        conectar.conectar();
+//        conectar.conectar();
 
-        cargarLogin();
+        //cargarLogin();
+        
+        cliente.obtenerDatos();
+        jLabel4.setText(cliente.getNombre());
+        jLabel5.setText(cliente.getSede());
     }
 
     private void cargarLogin() {

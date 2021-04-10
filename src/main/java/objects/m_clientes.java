@@ -46,5 +46,24 @@ public class m_clientes {
             JOptionPane.showMessageDialog(null, ex);
         }
     }
+    
+    public void autoconectar() {
+        boolean existe = false;
+        try {
+            Statement st = conectar.conexion();
+            String query = "select 1 ";
+            ResultSet rs = conectar.consulta(st, query);
+            if (rs.next()) {
+                existe = true;
+            }
+            conectar.cerrar(rs);
+            conectar.cerrar(st);
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "se perdio la conexion \n"+ex.getLocalizedMessage());
+            conectar.conectar();
+        }
+        //return existe;
+    }
 
 }
