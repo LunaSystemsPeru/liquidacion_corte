@@ -12,12 +12,14 @@ import javax.swing.JFrame;
 import objects.m_clientes;
 import objects.o_combobox;
 import vistas.frm_reportes;
+import vistas.frm_ver_alimentacion;
 import vistas.frm_ver_clientes;
 import vistas.frm_ver_jornaleros;
 import vistas.frm_ver_jornaldia;
 import vistas.frm_ver_cortadores;
 import vistas.frm_ver_envasadobarriles;
 import vistas.frm_ver_jornal_sincuenta;
+import vistas.frm_ver_liquidaciones;
 import vistas.frm_ver_parametros;
 
 /**
@@ -77,6 +79,7 @@ public class frm_principal extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
+        jButton11 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
@@ -198,11 +201,28 @@ public class frm_principal extends javax.swing.JFrame {
         });
         jToolBar1.add(jButton10);
 
+        jButton11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Food-Dome_379338.png"))); // NOI18N
+        jButton11.setText("Alimentacion");
+        jButton11.setFocusable(false);
+        jButton11.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton11.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton11);
+
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_37_SEO_Report_1688840.png"))); // NOI18N
         jButton5.setText("Liquidacion");
         jButton5.setFocusable(false);
         jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jButton5);
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_parameters_206463.png"))); // NOI18N
@@ -261,7 +281,7 @@ public class frm_principal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(jLabel5))
-                .addContainerGap(106, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -359,6 +379,16 @@ public class frm_principal extends javax.swing.JFrame {
         c_varios.llamar_ventana(formulario);
     }//GEN-LAST:event_jButton10ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        frm_ver_liquidaciones formulario = new frm_ver_liquidaciones();
+        c_varios.llamar_ventana(formulario);
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        frm_ver_alimentacion formulario = new frm_ver_alimentacion();
+        c_varios.llamar_ventana(formulario);
+    }//GEN-LAST:event_jButton11ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -398,6 +428,7 @@ public class frm_principal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

@@ -24,6 +24,7 @@ public class Corte {
     private String fecha;
     private int idempleado;
     private double peso;
+    private double costokilo;
     private int idcliente;
 
     public Corte() {
@@ -67,6 +68,14 @@ public class Corte {
 
     public void setIdcliente(int idcliente) {
         this.idcliente = idcliente;
+    }
+
+    public double getCostokilo() {
+        return costokilo;
+    }
+
+    public void setCostokilo(double costokilo) {
+        this.costokilo = costokilo;
     }
 
     public void verFilas(JTable tabla) {

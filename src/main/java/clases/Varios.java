@@ -440,4 +440,14 @@ public class Varios {
         }
         return m_fecha;
     }
+    
+    public void setearFecha(String date, com.toedter.calendar.JDateChooser dt_fecha) {
+        try {
+            java.util.Date date2;
+            date2 = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+            dt_fecha.setDate(date2);
+        } catch (ParseException ex) {
+            System.out.println(ex.getLocalizedMessage());
+        }
+    }
 }

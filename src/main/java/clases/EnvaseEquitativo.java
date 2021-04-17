@@ -5,9 +5,12 @@
  */
 package clases;
 
+import com.lunasystems.liquidacion.frm_principal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -16,6 +19,7 @@ import java.sql.Statement;
 public class EnvaseEquitativo {
 
     Conectar conectar = new Conectar();
+    Varios varios = new Varios();
 
     private int idenvase;
     private String fecha;
@@ -24,6 +28,7 @@ public class EnvaseEquitativo {
     private int idcliente;
 
     public EnvaseEquitativo() {
+        this.idcliente = frm_principal.cliente.getIdcliente();
     }
 
     public int getIdenvase() {
@@ -112,13 +117,13 @@ public class EnvaseEquitativo {
 
         return registrado;
     }
-    
+
     public boolean validarEnvase() {
         boolean existe = false;
         try {
             Statement st = conectar.conexion();
             String query = "select * from envase_equitativo "
-                    + "where fecha = '" + this.fecha + "' and idcliente = '"+this.idcliente+"' ";
+                    + "where fecha = '" + this.fecha + "' and idcliente = '" + this.idcliente + "' ";
             System.out.println(query);
             ResultSet rs = conectar.consulta(st, query);
             if (rs.next()) {
@@ -155,5 +160,70 @@ public class EnvaseEquitativo {
             System.out.println(ex.getLocalizedMessage());
         }
         return existe;
+    }
+
+    public void mostrarDiasTrabajados(JTable tabla, String anio, String mes) {
+        DefaultTableModel modelo;
+        modelo = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int fila, int columna) {
+                return false;
+            }
+        };
+
+        modelo.addColumn("Fecha");
+        modelo.addColumn("Cant. Barriles");
+        modelo.addColumn("Precio x Barril");
+        modelo.addColumn("Nro Jornaleros");
+        modelo.addColumn("Total S/");
+        modelo.addColumn(""); //idtipo
+
+        String sql = "select ee.idenvase, ee.fecha, ee.cant_barriles, ee.monto_pagar, COUNT(ed.idjornal) as nrojonal, sum(adicional - descuento) as adicional "
+                + "from envase_equitativo as ee "
+                + "inner join envase_detalle as ed on ee.idenvase = ed.idenvase "
+                + "where ee.idcliente = 3 and year(ee.fecha) = '" + anio + "' and month(ee.fecha) = '" + mes + "' "
+                + "group by ee.fecha "
+                + "order by ee.fecha asc ";
+        try {
+            Statement st = conectar.conexion();
+            ResultSet rs = conectar.consulta(st, sql);
+
+            int nrofila = 0;
+            while (rs.next()) {
+                nrofila++;
+
+                double barriles = rs.getDouble("cant_barriles");
+                double precioxbarril = rs.getDouble("monto_pagar");
+                double adicional = rs.getDouble("adicional");
+                double apagar = (barriles * precioxbarril) + adicional;
+
+                Object fila[] = new Object[6];
+                fila[0] = rs.getString("fecha");
+                fila[1] = barriles;
+                fila[2] = varios.formato_numero(precioxbarril);
+                fila[3] = rs.getInt("nrojonal");
+                fila[4] = varios.formato_numero(apagar);;
+                fila[5] = rs.getInt("idenvase");
+                modelo.addRow(fila);
+
+            }
+            conectar.cerrar(st);
+            conectar.cerrar(rs);
+
+            tabla.setModel(modelo);
+            tabla.getColumnModel().getColumn(0).setPreferredWidth(80);
+            tabla.getColumnModel().getColumn(1).setPreferredWidth(100);
+            tabla.getColumnModel().getColumn(2).setPreferredWidth(100);
+            tabla.getColumnModel().getColumn(3).setPreferredWidth(100);
+            tabla.getColumnModel().getColumn(4).setPreferredWidth(100);
+            tabla.getColumnModel().getColumn(5).setPreferredWidth(0);
+            varios.centrar_celda(tabla, 0);
+            varios.derecha_celda(tabla, 1);
+            varios.derecha_celda(tabla, 2);
+            varios.derecha_celda(tabla, 3);
+            varios.derecha_celda(tabla, 4);
+        } catch (SQLException e) {
+            System.out.print(e);
+        }
     }
 }
