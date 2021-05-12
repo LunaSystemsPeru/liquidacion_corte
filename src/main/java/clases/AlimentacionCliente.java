@@ -87,7 +87,7 @@ public class AlimentacionCliente {
         boolean registrado = false;
 
         Statement st = conectar.conexion();
-        String query = "update from alimentacion_cliente "
+        String query = "update alimentacion_cliente "
                 + "set precio = '" + this.precio + "' "
                 + "where iddetalle = '" + this.iditem + "' and idcliente = '" + this.idcliente + "'";
         int resultado = conectar.actualiza(st, query);
@@ -103,12 +103,15 @@ public class AlimentacionCliente {
         boolean existe = false;
         try {
             Statement st = conectar.conexion();
-            String query = "select * from alimentacion_cliente "
+            String query = "select ifnull(precio, 0) from alimentacion_cliente "
                     + "where iddetalle = '" + this.iditem + "' and idcliente = '" + this.idcliente + "'";
             ResultSet rs = conectar.consulta(st, query);
             if (rs.next()) {
                 existe = true;
                 this.precio = rs.getDouble("precio");
+            } else {
+                existe = true;
+                this.precio = 0;
             }
             conectar.cerrar(rs);
             conectar.cerrar(st);
@@ -123,6 +126,7 @@ public class AlimentacionCliente {
                 + "from parametros_detalle as pd "
                 + "left join alimentacion_cliente as ac on pd.iddetalle = ac.iddetalle and ac.idcliente = '" + this.idcliente + "' "
                 + "where pd.idparametros = '4'";
+        //System.out.println(sql);
 
         DefaultTableModel modelo;
         modelo = new DefaultTableModel() {

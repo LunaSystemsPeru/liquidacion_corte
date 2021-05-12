@@ -231,6 +231,83 @@ public class JornalDia {
         }
         return existe;
     }
+    
+    public void mostraHistoriaJornal(DefaultTableModel modelo) {
+        String sql = "select j.datos, cl.sede, ca.descripcion as cargo, jd.fecha, jd.hora_pago, jd.dia_pago, jd.hora_inicio, jd.hora_salida, tj.descripcion as tipojornal, jd.idcargo, jd.idjornal, jd.idtipo, jd.iddia, jd.reintegro, jd.descuento "
+                + "from jornal_dia as jd "
+                + "inner join jornaleros as j on j.idjornal = jd.idjornal "
+                + "inner join parametros_detalle as ca on ca.iddetalle = jd.idcargo "
+                + "inner join parametros_detalle as tj on tj.iddetalle = jd.idtipo "
+                + "inner join clientes as cl on cl.idcliente = jd.idcliente "
+                + "where jd.idjornal = '" + this.idjornal + "' "
+                + "order by jd.fecha asc ";
+        try {
+            Statement st = conectar.conexion();
+            ResultSet rs = conectar.consulta(st, sql);
+
+            int nrofila = 0;
+            while (rs.next()) {
+                nrofila++;
+
+                //restar horas
+                String horainicio = rs.getString("hora_inicio");
+                String horasalida = rs.getString("hora_salida");
+                double horas = varios.restarHoras(horainicio, horasalida);
+
+                horainicio = varios.Hora24a12(horainicio);
+                horasalida = varios.Hora24a12(horasalida);
+
+                //total dia
+                double pagototal = 0;
+                double diapago = rs.getDouble("dia_pago");
+                double horapago = rs.getDouble("hora_pago");
+                double dreintegro = rs.getDouble("reintegro");
+                double ddescuento = rs.getDouble("descuento");
+                if (diapago > 0) {
+                    pagototal = diapago;
+                }
+                if (horapago > 0) {
+                    pagototal = horas * horapago;
+                }
+
+                pagototal = pagototal + dreintegro - ddescuento;
+
+                Object fila[] = new Object[18];
+                fila[0] = nrofila;
+                fila[1] = rs.getString("datos");
+                fila[2] = varios.fecha_usuario(rs.getString("fecha"));
+                fila[3] = rs.getString("sede");
+                fila[4] = rs.getString("cargo");
+                if (diapago > 0) {
+                    fila[5] = varios.formato_numero(diapago);
+                } else {
+                    fila[5] = "";
+                }
+                if (horapago > 0) {
+                    fila[6] = varios.formato_numero(horapago);
+                } else {
+                    fila[6] = "";
+                }
+                fila[7] = horainicio;
+                fila[8] = horasalida;
+                fila[9] = varios.formato_numero(horas);
+                fila[10] = varios.formato_numero(dreintegro);
+                fila[11] = varios.formato_numero(ddescuento);
+                fila[12] = varios.formato_numero(pagototal);
+                fila[13] = rs.getString("tipojornal");
+                fila[14] = rs.getInt("idcargo");
+                fila[15] = rs.getInt("idjornal");
+                fila[16] = rs.getInt("idtipo");
+                fila[17] = rs.getInt("iddia");
+                modelo.addRow(fila);
+
+            }
+            conectar.cerrar(st);
+            conectar.cerrar(rs);
+        } catch (SQLException e) {
+            System.out.print(e);
+        }
+    }
 
     public void mostrarDiasJornal(DefaultTableModel modelo) {
         String sql = "select j.datos, ca.descripcion as cargo, jd.fecha, jd.hora_pago, jd.dia_pago, jd.hora_inicio, jd.hora_salida, tj.descripcion as tipojornal, jd.idcargo, jd.idjornal, jd.idtipo, jd.iddia, jd.reintegro, jd.descuento "
@@ -269,7 +346,7 @@ public class JornalDia {
                     pagototal = horas * horapago;
                 }
 
-                pagototal = pagototal + reintegro - descuento;
+                pagototal = pagototal + dreintegro - ddescuento;
 
                 Object fila[] = new Object[17];
                 fila[0] = nrofila;

@@ -564,6 +564,9 @@ public class ReporteJornal {
                 + "where ee.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and ee.idcliente = '" + this.idcliente + "' "
                 + "group by ed.idjornal "
                 + "order by j.datos asc";
+        
+        //se procede a hacer la consulta general de acuerdo al rango de fecha
+        
 
         //System.out.println(sql);
         titulos[idias + 4] = "Total Envasado";

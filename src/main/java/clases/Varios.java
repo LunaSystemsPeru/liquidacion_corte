@@ -66,6 +66,18 @@ public class Varios {
         numero = formato.format(number);
         return numero;
     }
+    
+    public Dimension obtenerSizePrincipal () {
+        Dimension desktopSize = frm_principal.jDesktopPane1.getSize();
+
+            int ancho = (int) (desktopSize.getWidth() / 1.05);
+            int alto = (int) (desktopSize.getHeight() / 1.05);
+            Dimension dfinal = new Dimension();
+            dfinal.setSize(ancho, alto);
+//            dfinal.height = alto;
+//            dfinal.width = ancho;
+            return dfinal;
+    }
 
     public void llamar_ventana(JInternalFrame ventana) {
 
@@ -449,5 +461,11 @@ public class Varios {
         } catch (ParseException ex) {
             System.out.println(ex.getLocalizedMessage());
         }
+    }
+    
+    public String convertFecha(com.toedter.calendar.JDateChooser dt_fecha) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String fecha = sdf.format(dt_fecha.getDate());
+        return fecha;
     }
 }

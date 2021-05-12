@@ -5,6 +5,7 @@
  */
 package clases;
 
+import com.lunasystems.liquidacion.frm_principal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -26,8 +27,10 @@ public class Alimentacion {
     private int idplatillo;
     private double movilidad;
     private double costoplatillo;
+    private final int idcliente;
 
     public Alimentacion() {
+        this.idcliente = frm_principal.cliente.getIdcliente();
     }
 
     public int getId() {
@@ -101,7 +104,8 @@ public class Alimentacion {
 
         Statement st = conectar.conexion();
         String query = "insert into alimentacion "
-                + "values ('" + id + "', '" + fecha + "', '" + cantporciones + "','" + idplatillo + "','" + movilidad + "','" + costoplatillo + "')";
+                + "values ('" + this.id + "', '" + this.fecha + "', '" + this.cantporciones + "','" + this.idplatillo + "', "
+                + " '" + this.movilidad + "','" + this.costoplatillo + "', '" + this.idcliente + "')";
         int resultado = conectar.actualiza(st, query);
         if (resultado > -1) {
             registrado = true;

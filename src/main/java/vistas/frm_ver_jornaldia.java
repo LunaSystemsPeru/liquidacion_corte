@@ -166,8 +166,11 @@ public class frm_ver_jornaldia extends javax.swing.JInternalFrame {
             tac_jornaleros.setMode(0);
             tac_jornaleros.setCaseSensitive(false);
             Statement st = conectar.conexion();
-            String sql = "select * from jornaleros "
-                    + "where idcliente = '" + cliente.getIdcliente() + "'";
+            String sql = "select jd.idjornal, j.datos "
+                    + "from jornal_dia as jd "
+                    + "inner join jornaleros as j on jd.idjornal = j.idjornal "
+                    + "where jd.idcliente = '" + cliente.getIdcliente() + "' "
+                    + "group by jd.idjornal ";
             ResultSet rs = conectar.consulta(st, sql);
             while (rs.next()) {
                 int iditem = rs.getInt("idjornal");

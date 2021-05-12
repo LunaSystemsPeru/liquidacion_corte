@@ -5,6 +5,7 @@
  */
 package forms;
 
+import clases.Alimentacion;
 import clases.AlimentacionCliente;
 import clases.Varios;
 import java.awt.event.ItemEvent;
@@ -22,7 +23,9 @@ public class frm_reg_alimentacion extends javax.swing.JInternalFrame {
     Varios c_varios = new Varios();
 
     m_alimentacion malimentacion = new m_alimentacion();
+
     AlimentacionCliente alcliente = new AlimentacionCliente();
+    Alimentacion alimentacion = new Alimentacion();
 
     DefaultTableModel modelo;
 
@@ -72,9 +75,9 @@ public class frm_reg_alimentacion extends javax.swing.JInternalFrame {
     }
 
     private void limpiar() {
-jTextField6.setText("");
-jTextField4.setText("");
-jTextField5.setText("");
+        jTextField6.setText("");
+        jTextField4.setText("");
+        jTextField5.setText("");
     }
 
     private void sumartabla() {
@@ -142,7 +145,6 @@ jTextField5.setText("");
         jLabel8 = new javax.swing.JLabel();
         jToolBar1 = new javax.swing.JToolBar();
         jButton4 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jButton5 = new javax.swing.JButton();
         jToolBar2 = new javax.swing.JToolBar();
@@ -267,6 +269,7 @@ jTextField5.setText("");
         jLabel7.setText("Movilidad:");
 
         cbx_tipo_alimentos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbx_tipo_alimentos.setEnabled(false);
         cbx_tipo_alimentos.setNextFocusableComponent(jTextField6);
         cbx_tipo_alimentos.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -280,6 +283,7 @@ jTextField5.setText("");
         });
 
         jTextField6.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField6.setEnabled(false);
         jTextField6.setNextFocusableComponent(jTextField4);
         jTextField6.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -288,6 +292,7 @@ jTextField5.setText("");
         });
 
         jTextField4.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField4.setEnabled(false);
         jTextField4.setNextFocusableComponent(jTextField5);
         jTextField4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -301,6 +306,7 @@ jTextField5.setText("");
         });
 
         jTextField5.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField5.setEnabled(false);
         jTextField5.setNextFocusableComponent(jButton2);
         jTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -397,14 +403,12 @@ jTextField5.setText("");
         jButton4.setFocusable(false);
         jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jButton4);
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Diskette_728991.png"))); // NOI18N
-        jButton1.setText("Grabar");
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(jButton1);
         jToolBar1.add(jSeparator1);
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_EditDocument_728933.png"))); // NOI18N
@@ -424,6 +428,7 @@ jTextField5.setText("");
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Add_728898.png"))); // NOI18N
         jButton2.setText("Añadir");
+        jButton2.setEnabled(false);
         jButton2.setFocusable(false);
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -535,6 +540,17 @@ jTextField5.setText("");
             double subtotal = cantidad * preciounit;
             double movilidad = Double.parseDouble(jTextField5.getText());
             double total = movilidad + subtotal;
+            
+             String fechadb = c_varios.convertFecha(jDateChooser1);
+
+            alimentacion.setCantporciones(cantidad);
+            alimentacion.setFecha(fechadb);
+            alimentacion.obtenerId();
+            alimentacion.setIdplatillo(combo_alcliente.getId());
+            alimentacion.setMovilidad(movilidad);
+            alimentacion.setCostoplatillo(preciounit);
+            alimentacion.insertar();
+
 
             Object filas[] = new Object[8];
             filas[0] = totalitemstabla + 1;
@@ -544,9 +560,9 @@ jTextField5.setText("");
             filas[4] = subtotal;
             filas[5] = movilidad;
             filas[6] = total;
-            filas[7] = combo_alcliente.getId();
+            filas[7] = alimentacion.getId();
             modelo.addRow(filas);
-            
+
             limpiar();
             sumartabla();
         }
@@ -569,10 +585,18 @@ jTextField5.setText("");
         c_varios.limitar_caracteres(evt, jTextField6, 8);
     }//GEN-LAST:event_jTextField6KeyTyped
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        cbx_tipo_alimentos.setEnabled(true);
+        jTextField6.setEnabled(true);
+        jTextField4.setEnabled(true);
+        jTextField5.setEnabled(true);
+        jButton2.setEnabled(true);
+
+    }//GEN-LAST:event_jButton4ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cbx_tipo_alimentos;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

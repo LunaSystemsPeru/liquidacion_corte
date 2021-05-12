@@ -75,7 +75,6 @@ public class frm_principal extends javax.swing.JFrame {
         jButton7 = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
@@ -152,18 +151,6 @@ public class frm_principal extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(jButton1);
-
-        jButton9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_General_Office_37_3592853.png"))); // NOI18N
-        jButton9.setText("Sin Cuentas");
-        jButton9.setFocusable(false);
-        jButton9.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton9.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton9ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton9);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_scissors_1054985.png"))); // NOI18N
         jButton2.setText("Corte Diario");
@@ -281,7 +268,7 @@ public class frm_principal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(jLabel5))
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addContainerGap(102, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -369,11 +356,6 @@ public class frm_principal extends javax.swing.JFrame {
         c_varios.llamar_ventana(formulario);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        frm_ver_jornal_sincuenta formulario = new frm_ver_jornal_sincuenta();
-        c_varios.llamar_ventana(formulario);
-    }//GEN-LAST:event_jButton9ActionPerformed
-
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
          frm_ver_envasadobarriles formulario = new frm_ver_envasadobarriles();
         c_varios.llamar_ventana(formulario);
@@ -436,7 +418,6 @@ public class frm_principal extends javax.swing.JFrame {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JComboBox<String> jComboBox1;
     public static javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JDialog jDialog1;
