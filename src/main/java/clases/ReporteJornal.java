@@ -336,7 +336,7 @@ public class ReporteJornal {
 
             subquery += " IFNULL((select (reintegro - descuento) "
                     + "FROM jornal_dia "
-                    + "WHERE idjornal = jd.idjornal AND fecha = '" + date + "' and idtipo = jd.idtipo),0) as '" + date + "', ";
+                    + "WHERE idcliente = jd.idcliente and idjornal = jd.idjornal AND fecha = '" + date + "' and idtipo = jd.idtipo),0) as '" + date + "', ";
 
             titulos[4 + i] = varios.fecha_usuario(date);
         }
@@ -350,8 +350,7 @@ public class ReporteJornal {
                 + "GROUP by jd.idjornal "
                 + "order by datos asc";
 
-       // System.out.println(sql);
-
+        // System.out.println(sql);
         titulos[idias + 4] = "Total a Pagar";
 
         Statement st = conectar.conexion();
@@ -373,13 +372,13 @@ public class ReporteJornal {
                 objectfila[2] = rs.getString("nrodocumento");
                 objectfila[3] = rs.getString("nrocuenta");
 
-                for (int j = 4; j < idias+4; j++) {
-                    
+                for (int j = 4; j < idias + 4; j++) {
+
                     if (varios.esDecimal(rs.getString(j))) {
-                        objectfila[j ] = rs.getDouble(j);
+                        objectfila[j] = rs.getDouble(j);
                         dapagar += rs.getDouble(j);
                     } else {
-                        objectfila[j ] = 0;
+                        objectfila[j] = 0;
                     }
 
                 }
@@ -485,7 +484,7 @@ public class ReporteJornal {
                     celda.setCellValue(filita[j] + "");
                 }
 
-                if (j > 3 && j < totalcolumnas ) {
+                if (j > 3 && j < totalcolumnas) {
                     celda.setCellValue((double) filita[j]);
                     celda.setCellStyle(style);
                     celda.setCellType(NUMERIC);
@@ -515,7 +514,7 @@ public class ReporteJornal {
             JOptionPane.showMessageDialog(null, "Error de entrada/salida \n" + ex.getLocalizedMessage());
         }
         //System.out.println(sql);
-          
+
     }
 
     public void rptPagoEnvasadoentreDias(String fecini, String fecfin) {
@@ -555,19 +554,17 @@ public class ReporteJornal {
             titulos[4 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "select ed.idjornal, j.datos, j.nrodocumento, j.nrocuenta, "
+        String sql = "select ed.idjornal, j.datos, j.nrodocumento, j.nrocuenta,  "
                 + subquery
-                + "sum(ed.adicional) as sadicional, sum(ed.descuento) as sdescuento "
+                + "sum(ed.adicional) as sadicional, sum(ed.descuento) as sdescuento, ee.cant_barriles "
                 + "from envase_detalle as ed  "
                 + "inner join jornaleros as j on j.idjornal = ed.idjornal "
                 + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
                 + "where ee.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and ee.idcliente = '" + this.idcliente + "' "
                 + "group by ed.idjornal "
                 + "order by j.datos asc";
-        
-        //se procede a hacer la consulta general de acuerdo al rango de fecha
-        
 
+        //se procede a hacer la consulta general de acuerdo al rango de fecha
         //System.out.println(sql);
         titulos[idias + 4] = "Total Envasado";
         titulos[idias + 5] = "Reintegro";
@@ -608,7 +605,7 @@ public class ReporteJornal {
                     }
                     sumapagobarril += monto;
                     objectfila[4 + i] = monto;
-                    objectfilafinal[4 + i] = barrilesfecha;
+                    //objectfilafinal[4 + i] = barrilesfecha;
                 }
 
                 double dapagar = sumapagobarril + dreintegro - ddescuento;
@@ -624,9 +621,13 @@ public class ReporteJornal {
                 objectfila[idias + 6] = ddescuento;
                 objectfila[idias + 7] = varios.formato_numero(dapagar);
 
+                objectfilafinal[4 + idias] = rs.getString("cant_barriles");
+                System.out.println(rs.getString("cant_barriles") + "cantidad de barriles " + idias + "\n");
+
                 listafilas.add(objectfila);
                 // System.out.println(Arrays.toString(objectfila));
             }
+
             objectfilafinal[idias + 4] = 0;
             objectfilafinal[idias + 5] = 0;
             objectfilafinal[idias + 6] = 0;
@@ -720,7 +721,7 @@ public class ReporteJornal {
         stylehora.setDataFormat(HSSFDataFormat.getBuiltinFormat("[HH]:mm"));
 
         int filanro = 1;
-      //  System.out.println(listafilas.size());
+        //  System.out.println(listafilas.size());
         for (int i = 0; i < listafilas.size(); i++) {
 
             // Ahora creamos una fila en la posicion 1
@@ -729,13 +730,13 @@ public class ReporteJornal {
             Object filita[] = (Object[]) listafilas.get(i);
             //System.out.println(Arrays.toString(filita));
             int totalcolumnas = idias + 8;
-          //  System.out.println(totalcolumnas + " es el total de columnas");
+            //  System.out.println(totalcolumnas + " es el total de columnas");
 
             for (int j = 0; j < (totalcolumnas); j++) {
                 // Creamos una celda en esa fila, en la
                 // posicion indicada por el contador del ciclo
                 HSSFCell celda = fila.createCell(j);
-               // System.out.println(filita[j] + " es de la fila " + j);
+                // System.out.println(filita[j] + " es de la fila " + j);
 
                 if (j < 4) {
                     celda.setCellValue(filita[j] + "");
@@ -778,7 +779,7 @@ public class ReporteJornal {
         fecha = varios.fecha_myql(fecha);
         String sql_hora = "select jd.hora_inicio, jd.hora_salida "
                 + "from jornal_dia as jd "
-                + "where jd.fecha = '" + fecha + "' and jd.idjornal = '" + idjornal + "' and jd.hora_pago = '" + hora_pago + "' and jd.dia_pago = '" + dia_pago + "' and jd.idcliente = '"+this.idcliente+"' ";
+                + "where jd.fecha = '" + fecha + "' and jd.idjornal = '" + idjornal + "' and jd.hora_pago = '" + hora_pago + "' and jd.dia_pago = '" + dia_pago + "' and jd.idcliente = '" + this.idcliente + "' ";
         // System.out.println(sql_hora);
         Statement st = conectar.conexion();
         ResultSet rs = conectar.consulta(st, sql_hora);

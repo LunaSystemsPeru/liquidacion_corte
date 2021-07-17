@@ -232,7 +232,11 @@ public class frm_reportes extends javax.swing.JInternalFrame {
         String ffechafinal = sdf.format(dt_fecha_fin.getDate());
 
         jornal.setIdcliente(idcliente);
-        jornal.setIdtipo(15);
+        
+        o_combobox combotipo = (o_combobox) cbx_tipo_jornal.getSelectedItem();
+        int idtipo = combotipo.getId();
+        jornal.setIdtipo(idtipo);
+
         jornal.rptPagoJornalsinHoras(varios.fecha_myql(ffechainicio), varios.fecha_myql(ffechafinal));
     }//GEN-LAST:event_jButton3ActionPerformed
 

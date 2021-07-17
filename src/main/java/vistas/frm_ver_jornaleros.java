@@ -258,7 +258,7 @@ public class frm_ver_jornaleros extends javax.swing.JInternalFrame {
                     + "from jornaleros as j "
                     + "inner join parametros_detalle as pd on pd.iddetalle = j.idcargo "
                     + "inner join clientes as c on c.idcliente = j.idcliente "
-                    + "where datos like '%" + texto + "%' or j.nrodocumento = '" + texto + "' "
+                    + "where datos like '%" + texto + "%' or j.nrodocumento = '" + texto + "' or j.nrocuenta = '"+texto+"' "
                     + "order by j.datos asc";
             jornal.verFilas(tbl_jornaleros, sql);
         }
