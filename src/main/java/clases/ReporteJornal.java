@@ -546,10 +546,10 @@ public class ReporteJornal {
         for (int i = 0; i < dias; i++) {
             Date fecha_temp = varios.suma_dia(fecini, i);
             String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fecha_temp);
-            subquery += "(select ifnull(envase_detalle.idenvase, 0) "
+            subquery += "ifnull((select ifnull(envase_detalle.idenvase, 0) "
                     + "from envase_detalle "
-                    + "inner join envase_equitativo on envase_equitativo.idenvase = envase_detalle.idenvase "
-                    + "where envase_detalle.idjornal = ed.idjornal and envase_equitativo.fecha= '" + date + "') "
+                    + "inner join envase_equitativo on envase_equitativo.idenvase = envase_detalle.idenvase  "
+                    + "where envase_detalle.idjornal = ed.idjornal and envase_equitativo.fecha= '" + date + "' and envase_equitativo.idcliente = ee.idcliente), 0) "
                     + "as '" + date + "', ";
             titulos[4 + i] = varios.fecha_usuario(date);
         }
@@ -586,6 +586,12 @@ public class ReporteJornal {
             objectfilafinal[2] = "";
             objectfilafinal[3] = "";
 
+            Object objectbarriles[] = new Object[idias + 9];
+            //objectbarriles[0] = "";
+            //objectbarriles[1] = "";
+            //objectbarriles[2] = "";
+            //objectbarriles[3] = "";
+
             while (rs.next()) {
 
                 Object objectfila[] = new Object[idias + 8];
@@ -594,18 +600,23 @@ public class ReporteJornal {
                 double sumapagobarril = 0;
 
                 for (int i = 0; i < dias; i++) {
-                    String idenvase = rs.getString(5 + i);
+                    int idenvase = rs.getInt(5 + i);
                     String[] resultado;
                     double monto = 0;
+                    int barrilesfechainicial = 0;
                     int barrilesfecha = 0;
-                    if (varios.esEntero(idenvase)) {
-                        resultado = obtenerTotalBarriles(Integer.parseInt(idenvase));
+                    if (idenvase > 0) {
+                        //if (varios.esEntero(validar_idenvase)) {
+                        resultado = obtenerTotalBarriles(idenvase);
                         monto = Double.parseDouble(resultado[0]);
                         barrilesfecha = Integer.parseInt(resultado[1] + "");
+                        if (barrilesfecha > 0) {
+                            barrilesfechainicial = barrilesfecha;
+                            objectbarriles[4 + i] = barrilesfechainicial;
+                        }
                     }
                     sumapagobarril += monto;
                     objectfila[4 + i] = monto;
-                    //objectfilafinal[4 + i] = barrilesfecha;
                 }
 
                 double dapagar = sumapagobarril + dreintegro - ddescuento;
@@ -621,13 +632,31 @@ public class ReporteJornal {
                 objectfila[idias + 6] = ddescuento;
                 objectfila[idias + 7] = varios.formato_numero(dapagar);
 
-                objectfilafinal[4 + idias] = rs.getString("cant_barriles");
-                System.out.println(rs.getString("cant_barriles") + "cantidad de barriles " + idias + "\n");
-
+                //objectfilafinal[4 + idias] = rs.getString("cant_barriles");
+                //System.out.println(rs.getString("cant_barriles") + " cantidad de barriles " + idias + "\n");
                 listafilas.add(objectfila);
                 // System.out.println(Arrays.toString(objectfila));
             }
 
+            int x = 0;
+            for (Object objectbarrile : objectbarriles) {
+                //System.out.println("valor de objeto " + objectbarrile);
+                int valorobjeto;
+                if (objectbarrile == null) {
+                    valorobjeto = 0;
+                } else {
+                    valorobjeto = Integer.parseInt(objectbarrile.toString());
+                }
+                //System.out.println("nuevo valor de objeto " + valorobjeto);
+                if (x < idias + 4) {
+                    if (x > 3) {
+                        objectfilafinal[x] = valorobjeto;
+                    }
+                    x++;
+                }
+
+            }
+            //System.out.println("largo de array = " + objectbarriles.length);
             objectfilafinal[idias + 4] = 0;
             objectfilafinal[idias + 5] = 0;
             objectfilafinal[idias + 6] = 0;
