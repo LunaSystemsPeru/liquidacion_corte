@@ -7,8 +7,11 @@ package com.lunasystems.liquidacion;
 
 import clases.Conectar;
 import clases.Varios;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
 import javax.swing.Timer;
 import objects.m_clientes;
 import objects.o_combobox;
@@ -21,21 +24,22 @@ public class frm_login extends javax.swing.JFrame {
 
     Varios c_varios = new Varios();
     Conectar conectar = new Conectar();
-    
-     m_clientes mcliente = new m_clientes();
+
+    m_clientes mcliente = new m_clientes();
 
     /**
      * Creates new form frm_login
      */
     public frm_login() {
         initComponents();
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/icon_formulario/icono.png")).getImage());
         conectar.conectar();
         autoconectar();
-        
-         mcliente.llenarClientes(jComboBox1);
-        
+
+        mcliente.llenarClientes(jComboBox1);
+
     }
-    
+
     private void autoconectar() {
         try {
             Timer timer = new Timer(35000, new ActionListener() {

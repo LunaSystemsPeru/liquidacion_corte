@@ -43,10 +43,10 @@ public class frm_principal extends javax.swing.JFrame {
     public frm_principal() {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         initComponents();
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/icon_formulario/icono.png")).getImage());
 //        conectar.conectar();
 
         //cargarLogin();
-        
         cliente.obtenerDatos();
         jLabel4.setText(cliente.getNombre());
         jLabel5.setText(cliente.getSede());
@@ -357,7 +357,7 @@ public class frm_principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-         frm_ver_envasadobarriles formulario = new frm_ver_envasadobarriles();
+        frm_ver_envasadobarriles formulario = new frm_ver_envasadobarriles();
         c_varios.llamar_ventana(formulario);
     }//GEN-LAST:event_jButton10ActionPerformed
 
