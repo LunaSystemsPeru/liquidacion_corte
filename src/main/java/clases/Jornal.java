@@ -139,6 +139,7 @@ public class Jornal {
                 + "set datos = '" + this.datos + "', "
                 + "nrodocumento = '" + this.nrodocumento + "', "
                 + "nrocuenta = '" + this.nrocuenta + "', "
+                + "idcargo= '" + this.idcargo + "', "
                 + "hora_pago = '" + this.pago_hora + "' "
                 + "where idjornal = '" + idjornal + "'";
         int resultado = conectar.actualiza(st, query);

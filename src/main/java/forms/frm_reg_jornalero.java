@@ -11,6 +11,7 @@ import clases.ParametroDetalle;
 import clases.Varios;
 import com.lunasystems.liquidacion.frm_principal;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import nicon.notify.core.Notification;
 import objects.m_tipo;
@@ -455,9 +456,9 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         if (jTextField2.getText().length() == 8) {
             try {
                 String json_datos = ApiPeruConsult.getJSONDNI(jTextField2.getText());
-                String datos = ApiPeruConsult.showJSONDNI(json_datos);
+                ArrayList datos = ApiPeruConsult.showJSONDNI(json_datos);
                 jTextField6.setText(jTextField2.getText());
-                jTextField7.setText(datos);
+                jTextField7.setText(datos.get(0) + " " + datos.get(1) + " " + datos.get(2));
 
                 jDialog1.setModal(true);
                 jDialog1.setSize(510, 170);

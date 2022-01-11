@@ -5,13 +5,17 @@
  */
 package clases;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.simple.parser.*;
 
 /**
  *
@@ -20,7 +24,6 @@ import org.json.simple.parser.ParseException;
 public class ApiPeruConsult {
 
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36";
-    private static final String SERVER_PATH = "http://lunasystemsperu.com/";
 
     public static String getJSONRUC(String ruc) {
 
@@ -73,7 +76,7 @@ public class ApiPeruConsult {
         try {
             //Generar la URL
             //String url = SERVER_PATH + "consultas_json/composer/consultas_dni_JMP.php?dni=" + dni;
-            String url = "http://lunasystemsperu.com/apis/apidni.php?dni=" + dni;
+            String url = "http://www.goempresarial.com/apis/peru-consult/public/consultaDNI.php?dni=" + dni;
             //Creamos un nuevo objeto URL con la url donde pedir el JSON
             URL obj = new URL(url);
             //Creamos un objeto de conexión
@@ -125,14 +128,22 @@ public class ApiPeruConsult {
         return datos;
     }
 
-    public static String showJSONDNI(String json) throws ParseException {
-        String datos;
+    public static ArrayList showJSONDNI(String json) throws ParseException {
+        ArrayList datos = new ArrayList(3);
         System.out.println("INFORMACIÓN OBTENIDA DE LA BASE DE DATOS:");
 
-        JSONParser Jparser = new JSONParser();
-        JSONObject result = (JSONObject) Jparser.parse(json);       //jsonObject
-        //datos = result.get("apellidoPaterno").toString() + " " + result.get("apellidoMaterno").toString() + " " + result.get("nombres").toString();
-        datos = result.get("nombre").toString();
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonElement obj = parser.parse(json);
+        JsonObject gsonObj = obj.getAsJsonObject();
+        System.out.println(gsonObj.get("apellidoPaterno"));
+        System.out.println(gsonObj.get("apellidoMaterno"));
+        System.out.println(gsonObj.get("nombres"));
+        
+        datos.add(gsonObj.get("apellidoPaterno").getAsString());
+        datos.add(gsonObj.get("apellidoMaterno").getAsString());
+        datos.add(gsonObj.get("nombres").getAsString());
+
         return datos;
     }
 }

@@ -21,6 +21,7 @@ import vistas.frm_ver_envasadobarriles;
 import vistas.frm_ver_jornal_sincuenta;
 import vistas.frm_ver_liquidaciones;
 import vistas.frm_ver_parametros;
+import vistas.frm_ver_personal;
 
 /**
  *
@@ -74,12 +75,10 @@ public class frm_principal extends javax.swing.JFrame {
         jComboBox1 = new javax.swing.JComboBox<>();
         jButton7 = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
+        jButton9 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
-        jButton11 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
@@ -140,8 +139,20 @@ public class frm_principal extends javax.swing.JFrame {
         jToolBar1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jToolBar1.setFloatable(false);
 
+        jButton9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/3876335_data_database_db_extension_file_icon.png"))); // NOI18N
+        jButton9.setText("DB Personal");
+        jButton9.setFocusable(false);
+        jButton9.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton9.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton9);
+
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_General_Office_37_3592853.png"))); // NOI18N
-        jButton1.setText("Empleados");
+        jButton1.setText("Jornaleros");
         jButton1.setFocusable(false);
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -151,18 +162,6 @@ public class frm_principal extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(jButton1);
-
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_scissors_1054985.png"))); // NOI18N
-        jButton2.setText("Corte Diario");
-        jButton2.setFocusable(false);
-        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton2);
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Road-Worker-1_379437.png"))); // NOI18N
         jButton4.setText("Jornal Diario");
@@ -187,30 +186,6 @@ public class frm_principal extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(jButton10);
-
-        jButton11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Food-Dome_379338.png"))); // NOI18N
-        jButton11.setText("Alimentacion");
-        jButton11.setFocusable(false);
-        jButton11.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton11.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton11ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton11);
-
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_37_SEO_Report_1688840.png"))); // NOI18N
-        jButton5.setText("Liquidacion");
-        jButton5.setFocusable(false);
-        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton5);
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_parameters_206463.png"))); // NOI18N
         jButton3.setText("Parametros");
@@ -268,7 +243,7 @@ public class frm_principal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(jLabel5))
-                .addContainerGap(102, Short.MAX_VALUE))
+                .addContainerGap(228, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -351,25 +326,15 @@ public class frm_principal extends javax.swing.JFrame {
         c_varios.llamar_ventana(formulario);
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        frm_ver_cortadores formulario = new frm_ver_cortadores();
-        c_varios.llamar_ventana(formulario);
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         frm_ver_envasadobarriles formulario = new frm_ver_envasadobarriles();
         c_varios.llamar_ventana(formulario);
     }//GEN-LAST:event_jButton10ActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        frm_ver_liquidaciones formulario = new frm_ver_liquidaciones();
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        frm_ver_personal formulario = new frm_ver_personal();
         c_varios.llamar_ventana(formulario);
-    }//GEN-LAST:event_jButton5ActionPerformed
-
-    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        frm_ver_alimentacion formulario = new frm_ver_alimentacion();
-        c_varios.llamar_ventana(formulario);
-    }//GEN-LAST:event_jButton11ActionPerformed
+    }//GEN-LAST:event_jButton9ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -410,14 +375,12 @@ public class frm_principal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
-    private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JComboBox<String> jComboBox1;
     public static javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JDialog jDialog1;

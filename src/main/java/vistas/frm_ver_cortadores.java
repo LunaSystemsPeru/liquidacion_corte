@@ -32,14 +32,14 @@ public class frm_ver_cortadores extends javax.swing.JInternalFrame {
      */
     public frm_ver_cortadores() {
         initComponents();
-        cliente.setIdcliente(frm_principal.cliente.getIdcliente());
-        obrero.setIdcliente(cliente.getIdcliente());
-
-        sql = "select * "
-                + "from obreros "
-                + "where idcliente = '" + cliente.getIdcliente() + "' "
-                + "order by datos asc";
-        obrero.verFilas(jTable1, sql);
+//        cliente.setIdcliente(frm_principal.cliente.getIdcliente());
+//        obrero.setIdcliente(cliente.getIdcliente());
+//
+//        sql = "select * "
+//                + "from obreros "
+//                + "where idcliente = '" + cliente.getIdcliente() + "' "
+//                + "order by datos asc";
+//        obrero.verFilas(jTable1, sql);
     }
 
     /**
@@ -254,25 +254,25 @@ public class frm_ver_cortadores extends javax.swing.JInternalFrame {
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         if (evt.getClickCount() == 2) {
-            jButton4.setEnabled(true);
-            fila_seleccionada = jTable1.getSelectedRow();
-            obrero.setIdobrero(Integer.parseInt(jTable1.getValueAt(fila_seleccionada, 0).toString()));
+//            jButton4.setEnabled(true);
+//            fila_seleccionada = jTable1.getSelectedRow();
+//            obrero.setIdobrero(Integer.parseInt(jTable1.getValueAt(fila_seleccionada, 0).toString()));
         }
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        jDialog1.setModal(true);
-        jDialog1.setSize(420, 500);
-        jDialog1.setLocationRelativeTo(null);
-
-        corte.setIdempleado(obrero.getIdobrero());
-        obrero.obtenerDatos();
-        jTextField2.setText(obrero.getDatos());
-        jTextField3.setText(obrero.getCodsistema());
-        corte.verFilas(jTable2);
-
-        jButton4.setEnabled(false);
-        jDialog1.setVisible(true);
+//        jDialog1.setModal(true);
+//        jDialog1.setSize(420, 500);
+//        jDialog1.setLocationRelativeTo(null);
+//
+//        corte.setIdempleado(obrero.getIdobrero());
+//        obrero.obtenerDatos();
+//        jTextField2.setText(obrero.getDatos());
+//        jTextField3.setText(obrero.getCodsistema());
+//        corte.verFilas(jTable2);
+//
+//        jButton4.setEnabled(false);
+//        jDialog1.setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
