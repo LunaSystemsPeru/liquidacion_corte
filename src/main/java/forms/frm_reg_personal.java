@@ -75,7 +75,7 @@ public class frm_reg_personal extends javax.swing.JDialog {
 
     private void llenar() {
         if (obrero.getIdobrero() == 0) {
-            if (obrero.getNrocuenta().length() > 0) {
+            if (txt_nrocuenta.getText().length() > 0) {
                 obrero.setFecha_modificacion(varios.getFechaActual());
             } else {
                 obrero.setFecha_modificacion("1000-01-01");

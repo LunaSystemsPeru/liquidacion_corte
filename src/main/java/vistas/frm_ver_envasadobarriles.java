@@ -5,10 +5,19 @@
  */
 package vistas;
 
+import clases.Conectar;
 import clases.EnvaseEquitativo;
 import clases.Varios;
+import com.lunasystems.liquidacion.frm_principal;
+import com.mxrck.autocompleter.AutoCompleterCallback;
+import com.mxrck.autocompleter.TextAutoCompleter;
 import forms.frm_reg_jornal_envase;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
 import objects.m_envase_equitativo;
+import objects.o_autocomplete;
 
 /**
  *
@@ -16,19 +25,70 @@ import objects.m_envase_equitativo;
  */
 public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
 
+    Conectar conectar = new Conectar();
     Varios varios = new Varios();
-    
     EnvaseEquitativo envase = new EnvaseEquitativo();
-    
     m_envase_equitativo menvase = new m_envase_equitativo();
+
+    TextAutoCompleter tac_jornaleros = null;
+    int idjornalero;
+
+    int filatabla2;
 
     /**
      * Creates new form frm_ver_envasadobarriles
      */
     public frm_ver_envasadobarriles() {
         initComponents();
-
+        envase.setIdcliente(frm_principal.cliente.getIdcliente());
         menvase.llenarMeses(jComboBox1, jYearChooser1.getValue() + "");
+
+        envase.mostrarDetalleEnvasado(jYearChooser1.getValue(), 0, "", jTable1);
+        cargarJornaleros();
+    }
+
+    private void cargarJornaleros() {
+        try {
+            if (tac_jornaleros != null) {
+                tac_jornaleros.removeAllItems();
+            }
+            tac_jornaleros = new TextAutoCompleter(jTextField1, new AutoCompleterCallback() {
+                @Override
+                public void callback(Object selectedItem) {
+                    Object itemSelected = selectedItem;
+                    //idjornalero.setIdjornal(0);
+                    if (itemSelected instanceof o_autocomplete) {
+                        int pcodigo = ((o_autocomplete) itemSelected).getId();
+                        String ptexto = ((o_autocomplete) itemSelected).getTexto();
+                        //System.out.println("jornal seleccionado " + ptexto);
+                        idjornalero = pcodigo;
+                    } else {
+                        System.out.println("El item es de un tipo desconocido");
+                    }
+                }
+            });
+
+            tac_jornaleros.setMode(0);
+            tac_jornaleros.setCaseSensitive(false);
+            Statement st = conectar.conexion();
+            String sql = "select j.idjornal, j.datos "
+                    + "from envase_detalle as ed "
+                    + "inner join jornaleros as j on j.idjornal = ed.idjornal "
+                    + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
+                    + "where  ee.idcliente = '" + envase.getIdcliente() + "' "
+                    + "group by ed.idjornal";
+            ResultSet rs = conectar.consulta(st, sql);
+            while (rs.next()) {
+                int iditem = rs.getInt("idjornal");
+                String descripcion = rs.getString("datos");
+                tac_jornaleros.addItem(new o_autocomplete(iditem, descripcion));
+            }
+            conectar.cerrar(rs);
+            conectar.cerrar(st);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error " + e.getLocalizedMessage());
+            System.out.println(e.getLocalizedMessage());
+        }
     }
 
     /**
@@ -42,6 +102,7 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
 
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -80,6 +141,18 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
         });
         jToolBar1.add(jButton1);
 
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Cancel_728918.png"))); // NOI18N
+        jButton5.setText("Salir");
+        jButton5.setFocusable(false);
+        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton5);
+
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Reporte Mensual"));
 
         jLabel5.setText("Año:");
@@ -108,6 +181,11 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
             }
         ));
         jTable2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jTable2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable2MouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(jTable2);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -155,11 +233,19 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
 
         jLabel2.setText("Buscar por Jornal");
 
-        jTextField1.setText("jTextField1");
-
         jButton2.setText("Buscar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Buscar");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -172,6 +258,7 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane1.setViewportView(jTable1);
 
         jLabel3.setText("nro Jornaleros");
@@ -189,7 +276,7 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -271,8 +358,25 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        envase.mostrarDiasTrabajados(jTable2, jYearChooser1.getValue()+"", jComboBox1.getSelectedItem().toString());
+        envase.mostrarDiasTrabajados(jTable2, jYearChooser1.getValue() + "", jComboBox1.getSelectedItem().toString());
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        envase.mostrarDetalleEnvasado(jYearChooser1.getValue(), idjornalero, "", jTable1);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        envase.mostrarDetalleEnvasado(jYearChooser1.getValue(), 0, "", jTable1);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jTable2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable2MouseClicked
+        filatabla2 = jTable2.getSelectedRow();
+        envase.mostrarDetalleEnvasado(jYearChooser1.getValue(), 0, jTable2.getValueAt(filatabla2, 0).toString(), jTable1);
+    }//GEN-LAST:event_jTable2MouseClicked
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_jButton5ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -280,6 +384,7 @@ public class frm_ver_envasadobarriles extends javax.swing.JInternalFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JComboBox<String> jComboBox1;
     private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;

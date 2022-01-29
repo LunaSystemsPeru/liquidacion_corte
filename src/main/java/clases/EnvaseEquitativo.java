@@ -172,16 +172,16 @@ public class EnvaseEquitativo {
         };
 
         modelo.addColumn("Fecha");
-        modelo.addColumn("Cant. Barriles");
-        modelo.addColumn("Precio x Barril");
-        modelo.addColumn("Nro Jornaleros");
+        modelo.addColumn("Barriles");
+        modelo.addColumn("S/ x Barr");
+        modelo.addColumn("Jornaleros");
         modelo.addColumn("Total S/");
         modelo.addColumn(""); //idtipo
 
         String sql = "select ee.idenvase, ee.fecha, ee.cant_barriles, ee.monto_pagar, COUNT(ed.idjornal) as nrojonal, sum(adicional - descuento) as adicional "
                 + "from envase_equitativo as ee "
                 + "inner join envase_detalle as ed on ee.idenvase = ed.idenvase "
-                + "where ee.idcliente = 3 and year(ee.fecha) = '" + anio + "' and month(ee.fecha) = '" + mes + "' "
+                + "where ee.idcliente = '" + this.idcliente + "' and year(ee.fecha) = '" + anio + "' and month(ee.fecha) = '" + mes + "' "
                 + "group by ee.fecha "
                 + "order by ee.fecha asc ";
         try {
@@ -202,7 +202,7 @@ public class EnvaseEquitativo {
                 fila[1] = barriles;
                 fila[2] = varios.formato_numero(precioxbarril);
                 fila[3] = rs.getInt("nrojonal");
-                fila[4] = varios.formato_numero(apagar);;
+                fila[4] = varios.formato_numero(apagar);
                 fila[5] = rs.getInt("idenvase");
                 modelo.addRow(fila);
 
@@ -212,10 +212,10 @@ public class EnvaseEquitativo {
 
             tabla.setModel(modelo);
             tabla.getColumnModel().getColumn(0).setPreferredWidth(80);
-            tabla.getColumnModel().getColumn(1).setPreferredWidth(100);
-            tabla.getColumnModel().getColumn(2).setPreferredWidth(100);
-            tabla.getColumnModel().getColumn(3).setPreferredWidth(100);
-            tabla.getColumnModel().getColumn(4).setPreferredWidth(100);
+            tabla.getColumnModel().getColumn(1).setPreferredWidth(60);
+            tabla.getColumnModel().getColumn(2).setPreferredWidth(60);
+            tabla.getColumnModel().getColumn(3).setPreferredWidth(50);
+            tabla.getColumnModel().getColumn(4).setPreferredWidth(75);
             tabla.getColumnModel().getColumn(5).setPreferredWidth(0);
             varios.centrar_celda(tabla, 0);
             varios.derecha_celda(tabla, 1);
@@ -226,4 +226,104 @@ public class EnvaseEquitativo {
             System.out.print(e);
         }
     }
+
+    public void mostrarDetalleEnvasado(Integer anio, Integer idjornal, String fecha, JTable tabla) {
+        String campo;
+        String valor;
+        String query = "select ed.idjornal, j.datos, ee.fecha, ee.cant_barriles, ee.monto_pagar as precio_barril, c.sede "
+                + "from envase_detalle as ed "
+                + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
+                + "inner join clientes as c on c.idcliente = ee.idcliente "
+                + "inner join jornaleros as j on j.idjornal = ed.idjornal "
+                + "where year(ee.fecha) = '0' "
+                + "group by ee.fecha, ee.idcliente, ed.idjornal "
+                + "order by ee.fecha asc";
+
+        if (idjornal > 0) {
+            campo = "ed.idjornal";
+            valor = idjornal + "";
+
+            query = "select ed.idjornal, j.datos, ee.fecha, ee.cant_barriles, ee.monto_pagar as precio_barril, c.sede "
+                    + "from envase_detalle as ed "
+                    + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
+                    + "inner join clientes as c on c.idcliente = ee.idcliente "
+                    + "inner join jornaleros as j on j.idjornal = ed.idjornal "
+                    + "where " + campo + " = '" + valor + "' and year(ee.fecha) = '" + anio + "' "
+                    + "group by ee.fecha, ee.idcliente, ed.idjornal "
+                    + "order by ee.fecha asc";
+        }
+        if (fecha.length() > 0) {
+            campo = "ee.fecha";
+            valor = fecha;
+
+            query = "select ed.idjornal, j.datos, ee.fecha, ee.cant_barriles, ee.monto_pagar as precio_barril, c.sede "
+                    + "from envase_detalle as ed "
+                    + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
+                    + "inner join clientes as c on c.idcliente = ee.idcliente "
+                    + "inner join jornaleros as j on j.idjornal = ed.idjornal "
+                    + "where " + campo + " = '" + valor + "' and year(ee.fecha) = '" + anio + "' and ee.idcliente = '" + this.idcliente + "' "
+                    + "group by ee.fecha, ee.idcliente, ed.idjornal "
+                    + "order by ee.fecha asc";
+        }
+
+        DefaultTableModel modelo;
+        modelo = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int fila, int columna) {
+                return false;
+            }
+        };
+
+        modelo.addColumn("Item");
+        modelo.addColumn("Jornalero");
+        modelo.addColumn("Fecha Envasado");
+        modelo.addColumn("Nro Barriles");
+        modelo.addColumn("Precio x Barril");
+        modelo.addColumn("Sede - Turno");
+        modelo.addColumn(""); //idjornal
+
+        try {
+            Statement st = conectar.conexion();
+            ResultSet rs = conectar.consulta(st, query);
+
+            int nrofila = 0;
+            while (rs.next()) {
+                nrofila++;
+
+                Object fila[] = new Object[7];
+                fila[0] = nrofila;
+                fila[1] = rs.getString("datos");
+                fila[2] = varios.fecha_usuario(rs.getString("fecha"));
+                fila[3] = rs.getInt("cant_barriles");
+                fila[4] = varios.formato_numero(rs.getDouble("precio_barril"));
+                fila[5] = rs.getString("sede");
+                fila[6] = rs.getInt("idjornal");
+                modelo.addRow(fila);
+
+            }
+            conectar.cerrar(st);
+            conectar.cerrar(rs);
+
+            tabla.setModel(modelo);
+            tabla.getColumnModel().getColumn(0).setPreferredWidth(40);
+            tabla.getColumnModel().getColumn(1).setPreferredWidth(300);
+            tabla.getColumnModel().getColumn(2).setPreferredWidth(100);
+            tabla.getColumnModel().getColumn(3).setPreferredWidth(70);
+            tabla.getColumnModel().getColumn(4).setPreferredWidth(70);
+            tabla.getColumnModel().getColumn(5).setPreferredWidth(150);
+            tabla.getColumnModel().getColumn(6).setMaxWidth(0);
+            tabla.getColumnModel().getColumn(6).setMinWidth(0);
+            tabla.getTableHeader().getColumnModel().getColumn(6).setMaxWidth(0);
+            tabla.getTableHeader().getColumnModel().getColumn(6).setMinWidth(0);
+            varios.centrar_celda(tabla, 0);
+            varios.centrar_celda(tabla, 2);
+            varios.centrar_celda(tabla, 3);
+            varios.derecha_celda(tabla, 4);
+            varios.centrar_celda(tabla, 5);
+        } catch (SQLException e) {
+            System.out.print(e);
+        }
+
+    }
+
 }
