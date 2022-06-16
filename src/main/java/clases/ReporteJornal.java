@@ -100,9 +100,10 @@ public class ReporteJornal {
                 + "inner join jornaleros as j on j.idjornal = jd.idjornal "
                 + "inner join parametros_detalle as car on car.iddetalle = jd.idcargo "
                 + "where jd.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and jd.idcliente = '" + this.idcliente + "' and jd.idtipo = '" + this.idtipo + "'  "
-                + "GROUP by jd.idjornal, jd.hora_pago "
+                + "group by jd.idjornal, jd.hora_pago "
                 + "order by datos asc, hora_pago asc";
 
+        //   
         titulos[idias + 7] = "Total Horas";
         titulos[idias + 8] = "Reintegro";
         titulos[idias + 9] = "Descuentos";
@@ -110,6 +111,7 @@ public class ReporteJornal {
 
         Statement st = conectar.conexion();
         ResultSet rs = conectar.consulta(st, sql);
+        System.out.println(sql);
         //ArrayList listafilas = new ArrayList();
         ArrayList<Object> listafilas = new ArrayList<>();
         try {
@@ -182,7 +184,7 @@ public class ReporteJornal {
             carpeta_reportes = carpetanueva + File.separator + "jornal" + fecini + "_hasta_" + fecfin;
         } else {
             JOptionPane.showMessageDialog(null, "SE GUARDARA EL REPORTE EN LA CARPETA POR DEFECTO");
-            carpeta_reportes += File.separator + "jornal" + fecini + "_hasta_" + fecfin;
+            carpeta_reportes += File.separator + "jornal_" + this.idtipo + "_" + fecini + "_hasta_" + fecfin;
         }
 
         //   System.out.println(guardarComo());
@@ -808,7 +810,7 @@ public class ReporteJornal {
         fecha = varios.fecha_myql(fecha);
         String sql_hora = "select jd.hora_inicio, jd.hora_salida "
                 + "from jornal_dia as jd "
-                + "where jd.fecha = '" + fecha + "' and jd.idjornal = '" + idjornal + "' and jd.hora_pago = '" + hora_pago + "' and jd.dia_pago = '" + dia_pago + "' and jd.idcliente = '" + this.idcliente + "' ";
+                + "where jd.fecha = '" + fecha + "' and jd.idjornal = '" + idjornal + "' and jd.hora_pago = '" + hora_pago + "' and jd.dia_pago = '" + dia_pago + "' and jd.idcliente = '" + this.idcliente + "' and jd.idtipo = '" + this.idtipo + "'";
         // System.out.println(sql_hora);
         Statement st = conectar.conexion();
         ResultSet rs = conectar.consulta(st, sql_hora);

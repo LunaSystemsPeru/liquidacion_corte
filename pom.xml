@@ -20,6 +20,7 @@
             <artifactId>jcalendar</artifactId>
             <version>1.4</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.java.net.substance/substance -->
         <dependency>
             <groupId>org.java.net.substance</groupId>
@@ -30,7 +31,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.22</version>
+            <version>8.0.28</version>
         </dependency>
         <dependency>
             <groupId>com.mxrck</groupId>

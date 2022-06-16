@@ -97,7 +97,7 @@ public class Varios {
         }
 
         frm_principal.jTabbedPane1.setTitleAt(contar, ventana.getTitle());
-        frm_principal.jTabbedPane1.setTabComponentAt(contar, new Cross(frm_principal.jTabbedPane1.getTitleAt(contar))); //agrega titulo y boton X.
+        frm_principal.jTabbedPane1.setTabComponentAt(contar, new Cross(ventana.getTitle())); //agrega titulo y boton X.
         frm_principal.jTabbedPane1.requestFocus();
         frm_principal.jTabbedPane1.setSelectedIndex(contar);
 

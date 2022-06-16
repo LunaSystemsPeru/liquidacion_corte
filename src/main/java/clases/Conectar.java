@@ -19,13 +19,13 @@ public class Conectar {
 
     //private static final String url= direccion +"/pesaje_db.db";
     private static Connection conexion = null;
-    private static final String BD = "brunoasc_liquidacionvilca"; // Nombre de BD.
-    private static final String USER = "brunoasc_luis_bd"; // Usuario de BD.
-    private static final String PASSWORD = "C]6&TN4Bt@&I"; // Password de BD.
+    private static final String BD = "gth_planilla"; // Nombre de BD.
+    private static final String USER = "lspadmin"; // Usuario de BD.
+    private static final String PASSWORD = ":18;t4BC9ZfjcF"; // Password de BD.
 
     // Driver para MySQL en este caso.
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    String server = "jdbc:mysql://artemisa.servidoresph.com:3306/" + BD;
+    String server = "jdbc:mysql://174.138.2.254:3306/" + BD;
 
     /**
      * ***** Prueba con SQLite
@@ -88,7 +88,7 @@ public class Conectar {
         } catch (SQLException e) {
             System.out.println("Error con: " + cadena);
             System.out.println("SQLException: " + e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return rs;
     }

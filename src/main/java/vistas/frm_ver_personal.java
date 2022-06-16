@@ -6,9 +6,9 @@
 package vistas;
 
 import clases.Obrero;
-import com.sun.glass.events.KeyEvent;
 import forms.frm_reg_personal;
 import java.awt.Frame;
+import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
 /**
@@ -230,7 +230,7 @@ public class frm_ver_personal extends javax.swing.JInternalFrame {
         String busqueda = jTextField1.getText().trim();
         query = "select * "
                 + "from obreros "
-                + "where concat(apepat, ' ', apemat, ' ', nombres) like '%" + busqueda + "%' or nrocuenta = '" + busqueda + "' "
+                + "where concat(apepat, ' ', apemat, ' ', nombres) like '%" + busqueda + "%' or nrocuenta = '" + busqueda + "' or nrodocumento = '" + busqueda + "' or nrodnititular = '" + busqueda + "' "
                 + "order by apepat, apemat, nombres asc";
         obrero.verFilas(jTable1, query);
         contarFilas();
@@ -246,7 +246,7 @@ public class frm_ver_personal extends javax.swing.JInternalFrame {
             String busqueda = jTextField1.getText().trim();
             query = "select * "
                     + "from obreros "
-                    + "where concat(apepat, ' ', apemat, ' ', nombres) like '%" + busqueda + "%' or nrocuenta = '" + busqueda + "' "
+                    + "where concat(apepat, ' ', apemat, ' ', nombres) like '%" + busqueda + "%' or nrocuenta = '" + busqueda + "' or nrodocumento = '" + busqueda + "' or nrodnititular = '" + busqueda + "' "
                     + "order by apepat, apemat, nombres asc";
             obrero.verFilas(jTable1, query);
             contarFilas();

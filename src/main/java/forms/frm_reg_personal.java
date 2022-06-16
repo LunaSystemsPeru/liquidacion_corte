@@ -49,7 +49,7 @@ public class frm_reg_personal extends javax.swing.JDialog {
             txt_nrotitular.setEnabled(true);
         }
     }
-    
+
     private void setearFecha(String date) {
         try {
             java.util.Date date2;
@@ -451,8 +451,10 @@ public class frm_reg_personal extends javax.swing.JDialog {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         llenar();
-        obrero.obtenerId();
-        obrero.insertar();
+        if (verificarDNI()) {
+            obrero.obtenerId();
+            obrero.insertar();
+        }
         limpiar();
     }//GEN-LAST:event_jButton2ActionPerformed
 

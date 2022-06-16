@@ -39,11 +39,8 @@ public class Cross extends JPanel {
         B.setIcon(getImage());
         //Listener para cierre de tabs con acceso estatico al `JTabbedPane`
         //B.addActionListener(frm_principal.jTabbedPane1.removeTabAt(frm_principal.jTabbedPane1.indexOfTab(title)));
-        B.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                frm_principal.jTabbedPane1.removeTabAt(frm_principal.jTabbedPane1.indexOfTab(title));
-            }
+        B.addActionListener((ActionEvent ae) -> {
+            frm_principal.jTabbedPane1.removeTabAt(frm_principal.jTabbedPane1.indexOfTab(title));
         });
         add(L, gbc);
         gbc.gridx++;

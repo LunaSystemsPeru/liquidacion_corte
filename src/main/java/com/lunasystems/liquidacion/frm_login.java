@@ -12,6 +12,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.Timer;
 import objects.m_clientes;
 import objects.o_combobox;
@@ -132,6 +133,7 @@ public class frm_login extends javax.swing.JFrame {
         this.dispose();
         frm_principal formulario = new frm_principal();
         formulario.setLocationRelativeTo(null);
+        formulario.setExtendedState(JFrame.MAXIMIZED_BOTH);
         formulario.setVisible(true);
     }//GEN-LAST:event_jButton7ActionPerformed
 

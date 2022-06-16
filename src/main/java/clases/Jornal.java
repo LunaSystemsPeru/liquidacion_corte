@@ -201,12 +201,11 @@ public class Jornal {
         };
         try {
             Statement st = conectar.conexion();
-            String sql = "select j.idjornal, j.datos, j.nrodocumento, j.nrocuenta, c.sede "
+            String sql = "select distinct(j.idjornal), j.datos, j.nrodocumento, j.nrocuenta, c.sede "
                     + "from jornal_dia as jd "
                     + "inner join jornaleros as j on j.idjornal = jd.idjornal "
                     + "inner join clientes as c on jd.idcliente = c.idcliente "
                     + "where j.nrocuenta = '' and jd.fecha between '" + fechainicio + "' and '" + fechafinal + "'  "
-                    + "group by jd.idjornal "
                     + "order by c.sede asc, j.datos asc";
 
             //and jd.idcliente = '" + this.idcliente + "'
