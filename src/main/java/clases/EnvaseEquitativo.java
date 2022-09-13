@@ -235,8 +235,8 @@ public class EnvaseEquitativo {
                 + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
                 + "inner join clientes as c on c.idcliente = ee.idcliente "
                 + "inner join jornaleros as j on j.idjornal = ed.idjornal "
-                + "where year(ee.fecha) = '0' "
-                + "group by ee.fecha, ee.idcliente, ed.idjornal "
+                + "where year(ee.fecha) = '0' and ee.idcliente = '" + this.idcliente + "' "
+                + "group by ee.fecha, ed.idjornal,ee.cant_barriles, ee.monto_pagar "
                 + "order by ee.fecha asc";
 
         if (idjornal > 0) {
@@ -248,8 +248,8 @@ public class EnvaseEquitativo {
                     + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
                     + "inner join clientes as c on c.idcliente = ee.idcliente "
                     + "inner join jornaleros as j on j.idjornal = ed.idjornal "
-                    + "where " + campo + " = '" + valor + "' and year(ee.fecha) = '" + anio + "' "
-                    + "group by ee.fecha, ee.idcliente, ed.idjornal "
+                    + "where " + campo + " = '" + valor + "' and year(ee.fecha) = '" + anio + "' and ee.idcliente = '" + this.idcliente + "' "
+                    + "group by ee.fecha, ed.idjornal,ee.cant_barriles, ee.monto_pagar "
                     + "order by ee.fecha asc";
         }
         if (fecha.length() > 0) {
@@ -262,7 +262,7 @@ public class EnvaseEquitativo {
                     + "inner join clientes as c on c.idcliente = ee.idcliente "
                     + "inner join jornaleros as j on j.idjornal = ed.idjornal "
                     + "where " + campo + " = '" + valor + "' and year(ee.fecha) = '" + anio + "' and ee.idcliente = '" + this.idcliente + "' "
-                    + "group by ee.fecha, ee.idcliente, ed.idjornal "
+                    + "group by ee.fecha, ed.idjornal,ee.cant_barriles, ee.monto_pagar "
                     + "order by ee.fecha asc";
         }
 

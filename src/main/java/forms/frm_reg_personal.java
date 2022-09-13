@@ -6,13 +6,15 @@
 package forms;
 
 import clases.ApiPeruConsult;
+import clases.Notificacion;
 import clases.Obrero;
 import clases.Varios;
+import java.awt.AWTException;
 import java.awt.event.KeyEvent;
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import nicon.notify.core.Notification;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -23,6 +25,8 @@ public class frm_reg_personal extends javax.swing.JDialog {
 
     Varios varios = new Varios();
     public static Obrero obrero = new Obrero();
+
+    Notificacion NotifyI = new Notificacion();
 
     /**
      * Creates new form frm_reg_personal
@@ -484,7 +488,11 @@ public class frm_reg_personal extends javax.swing.JDialog {
                 }
             }
         } else {
-            Notification.show("Error Consulta", "NO HA INGRESADO INFORMACION");
+            try {
+                NotifyI.displayTray("Error en Consulta", "NO HA INGRESADO INFORMACION");
+            } catch (AWTException | MalformedURLException ex) {
+                System.out.println(ex.getLocalizedMessage());
+            }
         }
     }//GEN-LAST:event_jButton5ActionPerformed
 

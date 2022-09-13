@@ -7,13 +7,15 @@ package forms;
 
 import clases.ApiPeruConsult;
 import clases.Jornal;
+import clases.Notificacion;
 import clases.ParametroDetalle;
 import clases.Varios;
 import com.lunasystems.liquidacion.frm_principal;
+import java.awt.AWTException;
 import java.awt.event.KeyEvent;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import nicon.notify.core.Notification;
 import objects.m_tipo;
 import objects.o_combobox;
 import org.json.simple.parser.ParseException;
@@ -31,20 +33,22 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     ParametroDetalle ccargo = new ParametroDetalle();
     Varios varios = new Varios();
 
+    Notificacion NotifyI = new Notificacion();
+
     /**
      * Creates new form frm_reg_empleado
      */
     public frm_reg_jornalero(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        jTextField3.requestFocus();
+        txt_datos.requestFocus();
 
-        mtipo.llenarCargos(jComboBox2);
+        mtipo.llenarCargos(cbx_cargo);
 
         if (jornal.getIdjornal() == 0) {
             //para crear nuevo 
             jTextField4.setText("");
-            jTextField3.requestFocus();
+            txt_datos.requestFocus();
             jButton3.setEnabled(false);
         } else {
             jButton3.setEnabled(true);
@@ -54,31 +58,33 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
             ccargo.setIddetalle(jornal.getIdcargo());
             ccargo.obtenerDatos();
 
-            jComboBox2.getModel().setSelectedItem(new o_combobox(ccargo.getIddetalle(), ccargo.getDescripcion()));
+            cbx_cargo.getModel().setSelectedItem(new o_combobox(ccargo.getIddetalle(), ccargo.getDescripcion()));
 
             jTextField4.setText(jornal.getIdjornal() + "");
-            jTextField3.setText(jornal.getDatos());
-            jTextField2.setText(jornal.getNrodocumento());
-            jTextField5.setText(jornal.getNrocuenta());
+            txt_datos.setText(jornal.getDatos());
+            txt_dni_jornal.setText(jornal.getDni_jornal());
+            txt_dni_cuenta.setText(jornal.getDni_cuenta());
+            txt_nro_cuenta.setText(jornal.getNro_cuenta());
             double monto = jornal.getPago_dia();
             cbx_pago.setSelectedIndex(0);
             if (monto == 0) {
                 monto = jornal.getPago_hora();
                 cbx_pago.setSelectedIndex(1);
             }
-            jTextField1.setText(varios.formato_numero(monto));
-            jTextArea1.setText(jornal.getDatos() + "\n" + jornal.getNrodocumento() + "\n" + jornal.getNrocuenta());
+            txt_monto.setText(varios.formato_numero(monto));
+            jTextArea1.setText(jornal.getDni_jornal() + "\n" + jornal.getDatos() + "\n" + jornal.getDni_cuenta() + "\n" + jornal.getNro_cuenta());
 
         }
     }
 
     private void llenar() {
         jornal.setIdcliente(frm_principal.cliente.getIdcliente());
-        jornal.setDatos(jTextField3.getText().toUpperCase().trim());
-        jornal.setNrocuenta(jTextField5.getText().trim());
-        jornal.setNrodocumento(jTextField2.getText().trim());
+        jornal.setDatos(txt_datos.getText().toUpperCase().trim());
+        jornal.setDni_jornal(txt_dni_jornal.getText());
+        jornal.setDni_cuenta(txt_dni_cuenta.getText().trim());
+        jornal.setNro_cuenta(txt_nro_cuenta.getText().trim());
 
-        double pago = Double.parseDouble(jTextField1.getText());
+        double pago = Double.parseDouble(txt_monto.getText());
         double pago_dia = 0;
         double pago_hora = 0;
         if (cbx_pago.getSelectedIndex() == 0) {
@@ -92,16 +98,52 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         jornal.setPago_dia(pago_dia);
         jornal.setPago_hora(pago_hora);
 
-        o_combobox cargo = (o_combobox) jComboBox2.getSelectedItem();
+        o_combobox cargo = (o_combobox) cbx_cargo.getSelectedItem();
         jornal.setIdcargo(cargo.getId());
     }
 
     private void limpiar() {
         jornal.setIdjornal(0);
-        jTextField2.setText("");
-        jTextField3.setText("");
-        jTextField1.setText("");
-        jTextField3.requestFocus();
+        txt_dni_cuenta.setText("");
+        txt_dni_jornal.setText("");
+        txt_nro_cuenta.setText("");
+        txt_datos.setText("");
+        txt_monto.setText("");
+        txt_datos.requestFocus();
+    }
+
+    private boolean validarCuenta() {
+        boolean encontrado = false;
+
+        String dnicuenta = txt_dni_cuenta.getText().trim();
+        String nrocuenta = txt_nro_cuenta.getText().trim();
+
+        if (dnicuenta.length() == 0) {
+            dnicuenta = "XXX";
+        } else {
+            jornal.setDni_jornal(dnicuenta);
+            if (jornal.validarDNIJornal()) {
+                jornal.obtenerDatos();
+                JOptionPane.showMessageDialog(null, "El # de DNI le pertenece a un jornalero \n" + jornal.getDatos());
+                encontrado = true;
+            }
+        }
+
+        if (nrocuenta.length() == 0) {
+            nrocuenta = "XXX";
+        }
+
+        jornal.setDni_cuenta(dnicuenta);
+        jornal.setNro_cuenta(nrocuenta);
+
+        if (jornal.validarCuenta()) {
+            jornal.obtenerDatos();
+            JOptionPane.showMessageDialog(null, "El # de DNI y/o la cuenta ya esta afiliada a otra cuenta\n" + jornal.getDatos());
+            encontrado = true;
+        } else {
+            encontrado = false;
+        }
+        return encontrado;
     }
 
     /**
@@ -118,17 +160,6 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         jLabel9 = new javax.swing.JLabel();
         jTextField6 = new javax.swing.JTextField();
         jTextField7 = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        cbx_pago = new javax.swing.JComboBox<>();
-        jLabel6 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jComboBox2 = new javax.swing.JComboBox<>();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -136,12 +167,28 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jButton4 = new javax.swing.JButton();
-        jTextField4 = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
-        jButton5 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        txt_datos = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        txt_dni_jornal = new javax.swing.JTextField();
+        jButton5 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        cbx_cargo = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
+        cbx_pago = new javax.swing.JComboBox<>();
+        jLabel6 = new javax.swing.JLabel();
+        txt_monto = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        txt_dni_cuenta = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txt_nro_cuenta = new javax.swing.JTextField();
+        jButton6 = new javax.swing.JButton();
 
         jDialog1.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialog1.setTitle("Datos Encontrados");
@@ -186,53 +233,6 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Agregar Jornalero");
-
-        jLabel1.setText("Apellidos y  Nombres:");
-
-        jLabel2.setText("Nro Cuenta:");
-
-        jLabel3.setText("Id.");
-
-        jLabel4.setText("Cargo:");
-
-        jLabel5.setText("Pago");
-
-        cbx_pago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "DIA", "HORA" }));
-        cbx_pago.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                cbx_pagoKeyPressed(evt);
-            }
-        });
-
-        jLabel6.setText("Monto:");
-
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTextField1KeyPressed(evt);
-            }
-        });
-
-        jTextField2.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTextField2KeyPressed(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTextField2KeyTyped(evt);
-            }
-        });
-
-        jTextField3.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTextField3KeyPressed(evt);
-            }
-        });
-
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox2.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jComboBox2KeyPressed(evt);
-            }
-        });
 
         jToolBar1.setFloatable(false);
 
@@ -287,13 +287,33 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         });
         jToolBar1.add(jButton4);
 
+        jTextArea1.setEditable(false);
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del Trabajador"));
+
+        jLabel3.setText("Id.");
+
         jTextField4.setEditable(false);
 
-        jLabel7.setText("Documento");
+        jLabel1.setText("Apellidos y  Nombres:");
 
-        jTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
+        txt_datos.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTextField5KeyPressed(evt);
+                txt_datosKeyPressed(evt);
+            }
+        });
+
+        jLabel7.setText("DNI Trabajador:");
+
+        txt_dni_jornal.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_dni_jornalKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_dni_jornalKeyTyped(evt);
             }
         });
 
@@ -305,10 +325,153 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
             }
         });
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jLabel4.setText("Cargo:");
+
+        cbx_cargo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbx_cargo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                cbx_cargoKeyPressed(evt);
+            }
+        });
+
+        jLabel5.setText("Pago");
+
+        cbx_pago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "DIA", "HORA" }));
+        cbx_pago.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                cbx_pagoKeyPressed(evt);
+            }
+        });
+
+        jLabel6.setText("Monto:");
+
+        txt_monto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_montoKeyPressed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txt_datos, javax.swing.GroupLayout.PREFERRED_SIZE, 406, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbx_cargo, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(cbx_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_monto, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txt_dni_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_datos, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_dni_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbx_cargo, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbx_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_monto, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de Pago"));
+
+        jLabel10.setText("DNI Titular CTA");
+
+        txt_dni_cuenta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_dni_cuentaKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_dni_cuentaKeyTyped(evt);
+            }
+        });
+
+        jLabel2.setText("Nro Cuenta BCP:");
+
+        txt_nro_cuenta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_nro_cuentaKeyPressed(evt);
+            }
+        });
+
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_arrow-right_3688522.png"))); // NOI18N
+        jButton6.setText("Buscar Cuenta x DNI Jornal");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_dni_cuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_nro_cuenta)))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_dni_cuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_nro_cuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -318,35 +481,9 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField5)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 406, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(cbx_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel6)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jButton5)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -354,45 +491,24 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbx_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        llenar();
-        jornal.obtenerId();
-        jornal.insertar();
-        limpiar();
+        if (!validarCuenta()) {
+            llenar();
+            jornal.obtenerId();
+            jornal.insertar();
+            limpiar();
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -403,61 +519,80 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         limpiar();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField3KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField3KeyPressed
+    private void txt_datosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_datosKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (jTextField3.getText().length() > 0) {
-                jTextField2.requestFocus();
+            if (txt_datos.getText().length() > 0) {
+                txt_dni_jornal.requestFocus();
             }
         }
-    }//GEN-LAST:event_jTextField3KeyPressed
+    }//GEN-LAST:event_txt_datosKeyPressed
 
-    private void jTextField2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField2KeyPressed
+    private void txt_dni_jornalKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_dni_jornalKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            jTextField5.requestFocus();
-        }
-    }//GEN-LAST:event_jTextField2KeyPressed
+            //verificar que dni del trabajador no este registrado 
+            if (txt_dni_jornal.getText().length() == 8) {
+                jornal.setDni_jornal(txt_dni_jornal.getText().trim());
+                if (jornal.validarDNIJornal()) {
+                    //el trabajador ya estra registrado
+                    JOptionPane.showMessageDialog(null, "Este Nro de DNI ya se encuentra registrado");
+                    cbx_cargo.setEnabled(false);
+                } else {
+                    //no esta registrado puede continuar
+                    cbx_cargo.setEnabled(true);
+                    cbx_cargo.requestFocus();
+                }
 
-    private void jTextField5KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField5KeyPressed
+            }
+
+        }
+    }//GEN-LAST:event_txt_dni_jornalKeyPressed
+
+    private void txt_nro_cuentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_nro_cuentaKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            jComboBox2.requestFocus();
+            boolean existecuenta = validarCuenta();
+            if (!existecuenta) {
+                jButton2.requestFocus();
+            }
         }
-    }//GEN-LAST:event_jTextField5KeyPressed
+    }//GEN-LAST:event_txt_nro_cuentaKeyPressed
 
-    private void jComboBox2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jComboBox2KeyPressed
+    private void cbx_cargoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cbx_cargoKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             cbx_pago.requestFocus();
         }
-    }//GEN-LAST:event_jComboBox2KeyPressed
+    }//GEN-LAST:event_cbx_cargoKeyPressed
 
     private void cbx_pagoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cbx_pagoKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            jTextField1.requestFocus();
+            txt_monto.requestFocus();
         }
     }//GEN-LAST:event_cbx_pagoKeyPressed
 
-    private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
+    private void txt_montoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_montoKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (jTextField1.getText().length() > 0) {
-                jButton2.requestFocus();
+            if (txt_monto.getText().length() > 0) {
+                txt_dni_cuenta.requestFocus();
             } else {
                 JOptionPane.showMessageDialog(null, "INGRESE MONTO");
             }
         }
-    }//GEN-LAST:event_jTextField1KeyPressed
+    }//GEN-LAST:event_txt_montoKeyPressed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        llenar();
-        jornal.actualizar();
-        limpiar();
-        jButton4.doClick();
+        if (!validarCuenta()) {
+            llenar();
+            jornal.actualizar();
+            limpiar();
+            jButton4.doClick();
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        if (jTextField2.getText().length() == 8) {
+        if (txt_dni_jornal.getText().length() == 8) {
             try {
-                String json_datos = ApiPeruConsult.getJSONDNI(jTextField2.getText());
+                String json_datos = ApiPeruConsult.getJSONDNI(txt_dni_jornal.getText());
                 ArrayList datos = ApiPeruConsult.showJSONDNI(json_datos);
-                jTextField6.setText(jTextField2.getText());
+                jTextField6.setText(txt_dni_jornal.getText());
                 jTextField7.setText(datos.get(0) + " " + datos.get(1) + " " + datos.get(2));
 
                 jDialog1.setModal(true);
@@ -470,15 +605,36 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
                 JOptionPane.showMessageDialog(null, ex.getLocalizedMessage());
             }
         } else {
-            Notification.show("Error Consulta", "NO HA INGRESADO INFORMACION");
+            try {
+                NotifyI.displayTray("Error en consulta", "NO HA INGRESADO INFORMACION");
+            } catch (AWTException | MalformedURLException ex) {
+                System.out.println(ex.getLocalizedMessage());
+            }
         }
 
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void jTextField2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField2KeyTyped
+    private void txt_dni_jornalKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_dni_jornalKeyTyped
         varios.solo_numeros(evt);
-        varios.limitar_caracteres(evt, jTextField2, 9);
-    }//GEN-LAST:event_jTextField2KeyTyped
+        varios.limitar_caracteres(evt, txt_dni_jornal, 9);
+    }//GEN-LAST:event_txt_dni_jornalKeyTyped
+
+    private void txt_dni_cuentaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_dni_cuentaKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            boolean existecuenta = validarCuenta();
+            if (!existecuenta) {
+                txt_nro_cuenta.requestFocus();
+            }
+        }
+    }//GEN-LAST:event_txt_dni_cuentaKeyPressed
+
+    private void txt_dni_cuentaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_dni_cuentaKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_dni_cuentaKeyTyped
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -524,15 +680,17 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbx_cargo;
     private javax.swing.JComboBox<String> cbx_pago;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JComboBox<String> jComboBox2;
+    private javax.swing.JButton jButton6;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -541,17 +699,20 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JTextField txt_datos;
+    private javax.swing.JTextField txt_dni_cuenta;
+    private javax.swing.JTextField txt_dni_jornal;
+    private javax.swing.JTextField txt_monto;
+    private javax.swing.JTextField txt_nro_cuenta;
     // End of variables declaration//GEN-END:variables
 }

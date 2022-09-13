@@ -6,11 +6,13 @@
 package clases;
 
 import com.lunasystems.liquidacion.frm_principal;
+import java.awt.AWTException;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,7 +25,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import nicon.notify.core.Notification;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -41,10 +42,14 @@ public class ReporteJornal {
     Conectar conectar = new Conectar();
     Varios varios = new Varios();
 
+    Notificacion NotifyI = new Notificacion();
+
     private int idcliente;
     private int idtipo;
+    private final String empresa;
 
     public ReporteJornal() {
+        empresa = frm_principal.cliente.getSede();
     }
 
     public void setIdcliente(int idcliente) {
@@ -75,14 +80,15 @@ public class ReporteJornal {
         String[] titulos;
         int idias = Integer.parseInt(dias + "");
 
-        titulos = new String[idias + 11];
+        titulos = new String[idias + 12];
         titulos[0] = "Item";
-        titulos[1] = "Empleado";
-        titulos[2] = "Nro Documento";
-        titulos[3] = "Nro Cuenta";
-        titulos[4] = "Cargo";
-        titulos[5] = "Dia Pago";
-        titulos[6] = "Hora Pago";
+        titulos[1] = "DNI Trabajador";
+        titulos[2] = "Empleado";
+        titulos[3] = "DNI Cuenta";
+        titulos[4] = "Nro Cuenta";
+        titulos[5] = "Cargo";
+        titulos[6] = "Dia Pago";
+        titulos[7] = "Hora Pago";
 
         for (int i = 0; i < dias; i++) {
             Date fecha_temp = varios.suma_dia(fecini, i);
@@ -92,22 +98,22 @@ public class ReporteJornal {
                     + "FROM jornal_dia "
                     + "WHERE idjornal = jd.idjornal AND fecha = '" + date + "' AND idcargo = jd.idcargo AND hora_pago = jd.hora_pago),0) as '" + date + "', ";
              */
-            titulos[7 + i] = varios.fecha_usuario(date);
+            titulos[8 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "SELECT jd.idjornal, j.datos, j.nrodocumento, j.nrocuenta, car.descripcion, jd.dia_pago, jd.hora_pago, sum(jd.reintegro) as sreintegro, sum(jd.descuento) as sdescuento "
+        String sql = "SELECT jd.idjornal, j.dni_trabajador, j.datos, j.dni_cuenta, j.nrocuenta, car.descripcion, jd.dia_pago, jd.hora_pago, sum(jd.reintegro) as sreintegro, sum(jd.descuento) as sdescuento "
                 + "from jornal_dia as jd "
                 + "inner join jornaleros as j on j.idjornal = jd.idjornal "
-                + "inner join parametros_detalle as car on car.iddetalle = jd.idcargo "
+                + "inner join parametros_detalle as car on car.iddetalle = j.idcargo "
                 + "where jd.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and jd.idcliente = '" + this.idcliente + "' and jd.idtipo = '" + this.idtipo + "'  "
-                + "group by jd.idjornal, jd.hora_pago "
+                + "group by jd.idjornal, jd.hora_pago, jd.dia_pago "
                 + "order by datos asc, hora_pago asc";
 
         //   
-        titulos[idias + 7] = "Total Horas";
-        titulos[idias + 8] = "Reintegro";
-        titulos[idias + 9] = "Descuentos";
-        titulos[idias + 10] = "Total a Pagar";
+        titulos[idias + 8] = "Total Horas";
+        titulos[idias + 9] = "Reintegro";
+        titulos[idias + 10] = "Descuentos";
+        titulos[idias + 11] = "Total a Pagar";
 
         Statement st = conectar.conexion();
         ResultSet rs = conectar.consulta(st, sql);
@@ -118,15 +124,14 @@ public class ReporteJornal {
             int nroitems = 1;
 
             while (rs.next()) {
-                Object objectfila[] = new Object[idias + 11];
+                Object objectfila[] = new Object[idias + 12];
                 int iidjornal = rs.getInt("idjornal");
                 double totalhorasjornal = 0;
+                int contardias = 0;
                 double dreintegro = rs.getDouble("sreintegro");
                 double ddescuento = rs.getDouble("sdescuento");
                 double dpagojornal = rs.getDouble("dia_pago");
-                if (dpagojornal == 0) {
-                    dpagojornal = rs.getDouble("hora_pago");
-                }
+                double hpagojornal = rs.getDouble("hora_pago");
 
                 for (int i = 0; i < dias; i++) {
                     Date fecha_temp = varios.suma_dia(fecini, i);
@@ -135,23 +140,31 @@ public class ReporteJornal {
                     double horatotal = obtenerHorasDia(iidjornal, fechafinal, rs.getString("hora_pago"), rs.getString("dia_pago"));
                     horatotal = horatotal / 24;
                     totalhorasjornal += horatotal;
-                    objectfila[7 + i] = horatotal;
+                    contardias++;
+                    objectfila[8 + i] = horatotal;
                 }
+                double dapagar = 0;
 
-                double dapagar = (totalhorasjornal * 24 * dpagojornal) + dreintegro - ddescuento;
+                if (dpagojornal == 0) {
+                    dapagar = (totalhorasjornal * 24 * hpagojornal) + dreintegro - ddescuento;
+                }
+                if (hpagojornal == 0) {
+                    dapagar = (contardias * dpagojornal) + dreintegro - ddescuento;
+                }
 
                 objectfila[0] = nroitems;
                 nroitems++;
-                objectfila[1] = rs.getString("datos");
-                objectfila[2] = rs.getString("nrodocumento");
-                objectfila[3] = rs.getString("nrocuenta");
-                objectfila[4] = rs.getString("descripcion");
-                objectfila[5] = rs.getDouble("dia_pago");
-                objectfila[6] = rs.getDouble("hora_pago");
-                objectfila[idias + 7] = totalhorasjornal;
-                objectfila[idias + 8] = dreintegro;
-                objectfila[idias + 9] = ddescuento;
-                objectfila[idias + 10] = dapagar;
+                objectfila[1] = rs.getString("dni_trabajador");
+                objectfila[2] = rs.getString("datos");
+                objectfila[3] = rs.getString("dni_cuenta");
+                objectfila[4] = rs.getString("nrocuenta");
+                objectfila[5] = rs.getString("descripcion");
+                objectfila[6] = rs.getDouble("dia_pago");
+                objectfila[7] = rs.getDouble("hora_pago");
+                objectfila[idias + 8] = totalhorasjornal;
+                objectfila[idias + 9] = dreintegro;
+                objectfila[idias + 10] = ddescuento;
+                objectfila[idias + 11] = dapagar;
 
                 listafilas.add(objectfila);
                 //System.out.println(Arrays.toString(objectfila));
@@ -162,7 +175,7 @@ public class ReporteJornal {
             System.out.println(e.getLocalizedMessage());
         }
 
-        // System.out.println(Arrays.toString(titulos));
+        System.out.println(Arrays.toString(titulos));
         File dir = new File("");
 
         String carpeta_reportes = dir.getAbsolutePath() + File.separator + "reportes";
@@ -181,7 +194,7 @@ public class ReporteJornal {
         if (guardar.showSaveDialog(frm_principal.jTabbedPane1) == JFileChooser.APPROVE_OPTION) {
             String carpetanueva = guardar.getSelectedFile().toString();
             // System.out.println(carpetanueva);
-            carpeta_reportes = carpetanueva + File.separator + "jornal" + fecini + "_hasta_" + fecfin;
+            carpeta_reportes = carpetanueva + File.separator + empresa + "_jornal" + fecini + "_hasta_" + fecfin;
         } else {
             JOptionPane.showMessageDialog(null, "SE GUARDARA EL REPORTE EN LA CARPETA POR DEFECTO");
             carpeta_reportes += File.separator + "jornal_" + this.idtipo + "_" + fecini + "_hasta_" + fecfin;
@@ -217,10 +230,10 @@ public class ReporteJornal {
         //System.out.println(titulos.length + " total columnas");
 
         pagina.setColumnWidth(0, 1550);
-        pagina.setColumnWidth(1, 15000);
-        pagina.setColumnWidth(2, 4200);
-        pagina.setColumnWidth(3, 4200);
-        pagina.setColumnWidth(4, 4200);
+        pagina.setColumnWidth(1, 2500);
+        pagina.setColumnWidth(2, 15000);
+        pagina.setColumnWidth(3, 2500);
+        pagina.setColumnWidth(4, 4500);
 
         // Creamos el encabezado
         for (int i = 0; i < titulos.length; i++) {
@@ -252,33 +265,46 @@ public class ReporteJornal {
             // Y colocamos los datos en esa fila
             Object filita[] = (Object[]) listafilas.get(i);
             //System.out.println(Arrays.toString(filita));
-            int totalcolumnas = idias + 11;
+            int totalcolumnas = idias + 12;
 
             for (int j = 0; j < (totalcolumnas); j++) {
                 // Creamos una celda en esa fila, en la
                 // posicion indicada por el contador del ciclo
                 HSSFCell celda = fila.createCell(j);
 
-                if (j < 5) {
-                    celda.setCellValue(filita[j] + "");
+//                if (filita[j] == null) {
+//                    System.out.println("fila nro " + j + " es nulo");
+//                }
+                if (j < 6) {
+                    if (filita[j] == null) {
+                        celda.setCellValue("");
+                    } else {
+                        celda.setCellValue(filita[j] + "");
+                    }
                 }
 
-                if (j == 5 || j == 6) {
+                if (j == 6 || j == 7) {
                     celda.setCellValue((double) filita[j]);
                     celda.setCellStyle(style);
                     celda.setCellType(NUMERIC);
                 }
 
-                if (j > 6 && j < totalcolumnas - 3) {
+                if (j > 7 && j < totalcolumnas - 3) {
                     celda.setCellValue((double) filita[j]);
                     celda.setCellStyle(stylehora);
                     celda.setCellType(NUMERIC);
                 }
 
                 if (j > totalcolumnas - 4) {
-                    celda.setCellValue((double) filita[j]);
-                    celda.setCellStyle(style);
-                    celda.setCellType(NUMERIC);
+                    if (filita[j] == null) {
+                        celda.setCellValue(0);
+                        celda.setCellStyle(style);
+                        celda.setCellType(NUMERIC);
+                    } else {
+                        celda.setCellValue((double) filita[j]);
+                        celda.setCellStyle(style);
+                        celda.setCellType(NUMERIC);
+                    }
                 }
             }
 
@@ -291,7 +317,7 @@ public class ReporteJornal {
             salida.close();
 
             System.out.println("Archivo creado existosamente en " + archivo.getAbsolutePath());
-            Notification.show("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
+            NotifyI.displayTray("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
 
             Desktop.getDesktop().open(new File(archivo.getAbsolutePath()));
         } catch (FileNotFoundException ex) {
@@ -302,7 +328,11 @@ public class ReporteJornal {
             System.out.println(ex.getLocalizedMessage());
             System.out.println("Error de entrada/salida");
             JOptionPane.showMessageDialog(null, "Error de entrada/salida \n" + ex.getLocalizedMessage());
+        } catch (AWTException ex) {
+            System.out.println(ex.getLocalizedMessage());
         }
+        //System.out.println(sql);
+
         //System.out.println(sql);
     }
 
@@ -326,11 +356,12 @@ public class ReporteJornal {
         String[] titulos;
         int idias = Integer.parseInt(dias + "");
 
-        titulos = new String[idias + 5];
+        titulos = new String[idias + 6];
         titulos[0] = "Item";
-        titulos[1] = "Empleado";
-        titulos[2] = "Nro Documento";
-        titulos[3] = "Nro Cuenta";
+        titulos[1] = "DNI Trabajador";
+        titulos[2] = "Jornalero";
+        titulos[3] = "DNI Cuenta";
+        titulos[4] = "Nro Cuenta";
 
         for (int i = 0; i < dias; i++) {
             Date fecha_temp = varios.suma_dia(fecini, i);
@@ -340,10 +371,10 @@ public class ReporteJornal {
                     + "FROM jornal_dia "
                     + "WHERE idcliente = jd.idcliente and idjornal = jd.idjornal AND fecha = '" + date + "' and idtipo = jd.idtipo),0) as '" + date + "', ";
 
-            titulos[4 + i] = varios.fecha_usuario(date);
+            titulos[5 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "SELECT jd.idjornal, j.datos, j.nrodocumento,  "
+        String sql = "SELECT jd.idjornal, j.datos, j.dni_trabajador, j.dni_cuenta, "
                 + subquery
                 + "j.nrocuenta "
                 + "from jornal_dia as jd "
@@ -353,7 +384,7 @@ public class ReporteJornal {
                 + "order by datos asc";
 
         // System.out.println(sql);
-        titulos[idias + 4] = "Total a Pagar";
+        titulos[idias + 5] = "Total a Pagar";
 
         Statement st = conectar.conexion();
         ResultSet rs = conectar.consulta(st, sql);
@@ -363,18 +394,19 @@ public class ReporteJornal {
             int nroitems = 1;
 
             while (rs.next()) {
-                Object objectfila[] = new Object[idias + 5];
+                Object objectfila[] = new Object[idias + 6];
                 int iidjornal = rs.getInt("idjornal");
 
                 double dapagar = 0;
 
                 objectfila[0] = nroitems;
                 nroitems++;
-                objectfila[1] = rs.getString("datos");
-                objectfila[2] = rs.getString("nrodocumento");
-                objectfila[3] = rs.getString("nrocuenta");
+                objectfila[1] = rs.getString("dni_trabajador");
+                objectfila[2] = rs.getString("datos");
+                objectfila[3] = rs.getString("dni_cuenta");
+                objectfila[4] = rs.getString("nrocuenta");
 
-                for (int j = 4; j < idias + 4; j++) {
+                for (int j = 5; j < idias + 5; j++) {
 
                     if (varios.esDecimal(rs.getString(j))) {
                         objectfila[j] = rs.getDouble(j);
@@ -384,11 +416,11 @@ public class ReporteJornal {
                     }
 
                 }
-                objectfila[idias + 4] = dapagar;
-                System.out.println("item " + idias + 4 + " valor = " + objectfila[idias + 4].toString());
+                objectfila[idias + 5] = dapagar;
+//                System.out.println("item " + idias + 5 + " valor = " + objectfila[idias + 5].toString());
 
                 listafilas.add(objectfila);
-                System.out.println(Arrays.toString(objectfila));
+                //System.out.println(Arrays.toString(objectfila));
             }
             conectar.cerrar(st);
             conectar.cerrar(rs);
@@ -415,7 +447,7 @@ public class ReporteJornal {
         if (guardar.showSaveDialog(frm_principal.jTabbedPane1) == JFileChooser.APPROVE_OPTION) {
             String carpetanueva = guardar.getSelectedFile().toString();
             // System.out.println(carpetanueva);
-            carpeta_reportes = carpetanueva + File.separator + "jornal_solomonto_" + fecini + "_hasta_" + fecfin;
+            carpeta_reportes = carpetanueva + File.separator + empresa + "_jornal_solomonto_" + fecini + "_hasta_" + fecfin;
         } else {
             JOptionPane.showMessageDialog(null, "SE GUARDARA EL REPORTE EN LA CARPETA POR DEFECTO");
             carpeta_reportes += File.separator + "jornal_solomonto_" + fecini + "_hasta_" + fecfin;
@@ -441,9 +473,10 @@ public class ReporteJornal {
         //System.out.println(titulos.length + " total columnas");
 
         pagina.setColumnWidth(0, 1550);
-        pagina.setColumnWidth(1, 15000);
-        pagina.setColumnWidth(2, 4200);
-        pagina.setColumnWidth(3, 4200);
+        pagina.setColumnWidth(1, 2500);
+        pagina.setColumnWidth(2, 10500);
+        pagina.setColumnWidth(3, 2500);
+        pagina.setColumnWidth(4, 3800);
 
         // Creamos el encabezado
         for (int i = 0; i < titulos.length; i++) {
@@ -475,18 +508,18 @@ public class ReporteJornal {
             // Y colocamos los datos en esa fila
             Object filita[] = (Object[]) listafilas.get(i);
             //System.out.println(Arrays.toString(filita));
-            int totalcolumnas = idias + 5;
+            int totalcolumnas = idias + 6;
 
             for (int j = 0; j < (totalcolumnas); j++) {
                 // Creamos una celda en esa fila, en la
                 // posicion indicada por el contador del ciclo
                 HSSFCell celda = fila.createCell(j);
 
-                if (j < 4) {
+                if (j < 5) {
                     celda.setCellValue(filita[j] + "");
                 }
 
-                if (j > 3 && j < totalcolumnas) {
+                if (j > 4 && j < totalcolumnas) {
                     celda.setCellValue((double) filita[j]);
                     celda.setCellStyle(style);
                     celda.setCellType(NUMERIC);
@@ -503,7 +536,7 @@ public class ReporteJornal {
             salida.close();
 
             System.out.println("Archivo creado existosamente en " + archivo.getAbsolutePath());
-            Notification.show("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
+            NotifyI.displayTray("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
 
             Desktop.getDesktop().open(new File(archivo.getAbsolutePath()));
         } catch (FileNotFoundException ex) {
@@ -514,9 +547,12 @@ public class ReporteJornal {
             System.out.println(ex.getLocalizedMessage());
             System.out.println("Error de entrada/salida");
             JOptionPane.showMessageDialog(null, "Error de entrada/salida \n" + ex.getLocalizedMessage());
+        } catch (AWTException ex) {
+            System.out.println(ex.getLocalizedMessage());
         }
         //System.out.println(sql);
 
+        //System.out.println(sql);
     }
 
     public void rptPagoEnvasadoentreDias(String fecini, String fecfin) {
@@ -539,11 +575,12 @@ public class ReporteJornal {
         String[] titulos;
         int idias = Integer.parseInt(dias + "");
 
-        titulos = new String[idias + 8];
+        titulos = new String[idias + 9];
         titulos[0] = "Item";
-        titulos[1] = "Empleado";
-        titulos[2] = "Nro Documento";
-        titulos[3] = "Nro Cuenta";
+        titulos[1] = "DNI Trabajador";
+        titulos[2] = "Empleado";
+        titulos[3] = "DNI Cuenta";
+        titulos[4] = "Nro Cuenta";
 
         for (int i = 0; i < dias; i++) {
             Date fecha_temp = varios.suma_dia(fecini, i);
@@ -553,10 +590,10 @@ public class ReporteJornal {
                     + "inner join envase_equitativo on envase_equitativo.idenvase = envase_detalle.idenvase  "
                     + "where envase_detalle.idjornal = ed.idjornal and envase_equitativo.fecha= '" + date + "' and envase_equitativo.idcliente = ee.idcliente), 0) "
                     + "as '" + date + "', ";
-            titulos[4 + i] = varios.fecha_usuario(date);
+            titulos[5 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "select ed.idjornal, j.datos, j.nrodocumento, j.nrocuenta,  "
+        String sql = "select ed.idjornal, j.datos, j.dni_trabajador, j.dni_cuenta, j.nrocuenta,  "
                 + subquery
                 + "sum(ed.adicional) as sadicional, sum(ed.descuento) as sdescuento, ee.cant_barriles "
                 + "from envase_detalle as ed  "
@@ -567,11 +604,11 @@ public class ReporteJornal {
                 + "order by j.datos asc";
 
         //se procede a hacer la consulta general de acuerdo al rango de fecha
-        //System.out.println(sql);
-        titulos[idias + 4] = "Total Envasado";
-        titulos[idias + 5] = "Reintegro";
-        titulos[idias + 6] = "Descuentos";
-        titulos[idias + 7] = "Total a Pagar";
+        System.out.println(sql);
+        titulos[idias + 5] = "Total Envasado";
+        titulos[idias + 6] = "Reintegro";
+        titulos[idias + 7] = "Descuentos";
+        titulos[idias + 8] = "Total a Pagar";
         //System.out.println(Arrays.toString(titulos));
 
         Statement st = conectar.conexion();
@@ -582,13 +619,14 @@ public class ReporteJornal {
         try {
             int nroitems = 1;
             double sumatotal = 0;
-            Object objectfilafinal[] = new Object[idias + 8];
-            objectfilafinal[1] = "NRO DE BARRILES - SUMA TOTALES ";
+            Object objectfilafinal[] = new Object[idias + 9];
             objectfilafinal[0] = "";
-            objectfilafinal[2] = "";
+            objectfilafinal[1] = "";
+            objectfilafinal[2] = "NRO DE BARRILES - SUMA TOTALES ";
             objectfilafinal[3] = "";
+            objectfilafinal[4] = "";
 
-            Object objectbarriles[] = new Object[idias + 9];
+            Object objectbarriles[] = new Object[idias + 10];
             //objectbarriles[0] = "";
             //objectbarriles[1] = "";
             //objectbarriles[2] = "";
@@ -596,13 +634,13 @@ public class ReporteJornal {
 
             while (rs.next()) {
 
-                Object objectfila[] = new Object[idias + 8];
+                Object objectfila[] = new Object[idias + 9];
                 double dreintegro = rs.getDouble("sadicional");
                 double ddescuento = rs.getDouble("sdescuento");
                 double sumapagobarril = 0;
 
                 for (int i = 0; i < dias; i++) {
-                    int idenvase = rs.getInt(5 + i);
+                    int idenvase = rs.getInt(6 + i);
                     String[] resultado;
                     double monto = 0;
                     int barrilesfechainicial = 0;
@@ -614,11 +652,11 @@ public class ReporteJornal {
                         barrilesfecha = Integer.parseInt(resultado[1] + "");
                         if (barrilesfecha > 0) {
                             barrilesfechainicial = barrilesfecha;
-                            objectbarriles[4 + i] = barrilesfechainicial;
+                            objectbarriles[5 + i] = barrilesfechainicial;
                         }
                     }
                     sumapagobarril += monto;
-                    objectfila[4 + i] = monto;
+                    objectfila[5 + i] = monto;
                 }
 
                 double dapagar = sumapagobarril + dreintegro - ddescuento;
@@ -626,13 +664,14 @@ public class ReporteJornal {
 
                 objectfila[0] = nroitems;
                 nroitems++;
-                objectfila[1] = rs.getString("datos");
-                objectfila[2] = rs.getString("nrodocumento");
-                objectfila[3] = rs.getString("nrocuenta");
-                objectfila[idias + 4] = varios.formato_numero(sumapagobarril);
-                objectfila[idias + 5] = dreintegro;
-                objectfila[idias + 6] = ddescuento;
-                objectfila[idias + 7] = varios.formato_numero(dapagar);
+                objectfila[1] = rs.getString("dni_trabajador");
+                objectfila[2] = rs.getString("datos");
+                objectfila[3] = rs.getString("dni_cuenta");
+                objectfila[4] = rs.getString("nrocuenta");
+                objectfila[idias + 5] = varios.formato_numero(sumapagobarril);
+                objectfila[idias + 6] = dreintegro;
+                objectfila[idias + 7] = ddescuento;
+                objectfila[idias + 8] = varios.formato_numero(dapagar);
 
                 //objectfilafinal[4 + idias] = rs.getString("cant_barriles");
                 //System.out.println(rs.getString("cant_barriles") + " cantidad de barriles " + idias + "\n");
@@ -650,8 +689,8 @@ public class ReporteJornal {
                     valorobjeto = Integer.parseInt(objectbarrile.toString());
                 }
                 //System.out.println("nuevo valor de objeto " + valorobjeto);
-                if (x < idias + 4) {
-                    if (x > 3) {
+                if (x < idias + 5) {
+                    if (x > 4) {
                         objectfilafinal[x] = valorobjeto;
                     }
                     x++;
@@ -659,10 +698,10 @@ public class ReporteJornal {
 
             }
             //System.out.println("largo de array = " + objectbarriles.length);
-            objectfilafinal[idias + 4] = 0;
             objectfilafinal[idias + 5] = 0;
             objectfilafinal[idias + 6] = 0;
-            objectfilafinal[idias + 7] = varios.formato_numero(sumatotal);
+            objectfilafinal[idias + 7] = 0;
+            objectfilafinal[idias + 8] = varios.formato_numero(sumatotal);
             listafilas.add(objectfilafinal);
 
             conectar.cerrar(st);
@@ -690,7 +729,7 @@ public class ReporteJornal {
         if (guardar.showSaveDialog(frm_principal.jTabbedPane1) == JFileChooser.APPROVE_OPTION) {
             String carpetanueva = guardar.getSelectedFile().toString();
             // System.out.println(carpetanueva);
-            carpeta_reportes = carpetanueva + File.separator + "jornal_envase_" + fecini + "_hasta_" + fecfin;
+            carpeta_reportes = carpetanueva + File.separator + empresa + "_jornal_envase_" + fecini + "_hasta_" + fecfin;
         } else {
             JOptionPane.showMessageDialog(null, "SE GUARDARA EL REPORTE EN LA CARPETA POR DEFECTO");
             carpeta_reportes += File.separator + "jornal_envase_" + fecini + "_hasta_" + fecfin;
@@ -726,9 +765,10 @@ public class ReporteJornal {
         //System.out.println(titulos.length + " total columnas");
 
         pagina.setColumnWidth(0, 1550);
-        pagina.setColumnWidth(1, 15000);
-        pagina.setColumnWidth(2, 4200);
-        pagina.setColumnWidth(3, 4200);
+        pagina.setColumnWidth(1, 3200);
+        pagina.setColumnWidth(2, 10500);
+        pagina.setColumnWidth(3, 3200);
+        pagina.setColumnWidth(4, 4300);
 
         // Creamos el encabezado
         for (int i = 0; i < titulos.length; i++) {
@@ -760,7 +800,7 @@ public class ReporteJornal {
             // Y colocamos los datos en esa fila
             Object filita[] = (Object[]) listafilas.get(i);
             //System.out.println(Arrays.toString(filita));
-            int totalcolumnas = idias + 8;
+            int totalcolumnas = idias + 9;
             //  System.out.println(totalcolumnas + " es el total de columnas");
 
             for (int j = 0; j < (totalcolumnas); j++) {
@@ -769,11 +809,11 @@ public class ReporteJornal {
                 HSSFCell celda = fila.createCell(j);
                 // System.out.println(filita[j] + " es de la fila " + j);
 
-                if (j < 4) {
+                if (j < 5) {
                     celda.setCellValue(filita[j] + "");
                 }
 
-                if (j > 3) {
+                if (j > 4) {
                     celda.setCellValue(Double.parseDouble(filita[j] + ""));
                     celda.setCellStyle(style);
                     celda.setCellType(NUMERIC);
@@ -790,7 +830,7 @@ public class ReporteJornal {
             salida.close();
 
             System.out.println("Archivo creado existosamente en " + archivo.getAbsolutePath());
-            Notification.show("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
+            NotifyI.displayTray("Creado", "Archivo creado existosamente en " + archivo.getAbsolutePath());
 
             Desktop.getDesktop().open(new File(archivo.getAbsolutePath()));
         } catch (FileNotFoundException ex) {
@@ -801,6 +841,8 @@ public class ReporteJornal {
             System.out.println(ex.getLocalizedMessage());
             System.out.println("Error de entrada/salida");
             JOptionPane.showMessageDialog(null, "Error de entrada/salida \n" + ex.getLocalizedMessage());
+        } catch (AWTException ex) {
+            System.out.println(ex.getLocalizedMessage());
         }
         //System.out.println(sql);
     }

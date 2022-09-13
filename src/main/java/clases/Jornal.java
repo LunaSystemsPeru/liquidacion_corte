@@ -24,12 +24,13 @@ public class Jornal {
 
     private int idjornal;
     private String datos;
-    private int idcliente;
+    private String dni_jornal;
+    private int idcargo;
     private double pago_dia;
     private double pago_hora;
-    private int idcargo;
-    private String nrodocumento;
-    private String nrocuenta;
+    private String dni_cuenta;
+    private String nro_cuenta;
+    private int idcliente;
 
     public Jornal() {
     }
@@ -50,12 +51,20 @@ public class Jornal {
         this.datos = datos;
     }
 
-    public int getIdcliente() {
-        return idcliente;
+    public String getDni_jornal() {
+        return dni_jornal;
     }
 
-    public void setIdcliente(int idcliente) {
-        this.idcliente = idcliente;
+    public void setDni_jornal(String dni_jornal) {
+        this.dni_jornal = dni_jornal;
+    }
+
+    public int getIdcargo() {
+        return idcargo;
+    }
+
+    public void setIdcargo(int idcargo) {
+        this.idcargo = idcargo;
     }
 
     public double getPago_dia() {
@@ -74,28 +83,28 @@ public class Jornal {
         this.pago_hora = pago_hora;
     }
 
-    public int getIdcargo() {
-        return idcargo;
+    public String getDni_cuenta() {
+        return dni_cuenta;
     }
 
-    public void setIdcargo(int idcargo) {
-        this.idcargo = idcargo;
+    public void setDni_cuenta(String dni_cuenta) {
+        this.dni_cuenta = dni_cuenta;
     }
 
-    public String getNrodocumento() {
-        return nrodocumento;
+    public String getNro_cuenta() {
+        return nro_cuenta;
     }
 
-    public void setNrodocumento(String nrodocumento) {
-        this.nrodocumento = nrodocumento;
+    public void setNro_cuenta(String nro_cuenta) {
+        this.nro_cuenta = nro_cuenta;
     }
 
-    public String getNrocuenta() {
-        return nrocuenta;
+    public int getIdcliente() {
+        return idcliente;
     }
 
-    public void setNrocuenta(String nrocuenta) {
-        this.nrocuenta = nrocuenta;
+    public void setIdcliente(int idcliente) {
+        this.idcliente = idcliente;
     }
 
     public void obtenerId() {
@@ -121,7 +130,7 @@ public class Jornal {
 
         Statement st = conectar.conexion();
         String query = "insert into jornaleros "
-                + "values ('" + idjornal + "', '" + datos + "', '" + idcliente + "','" + pago_dia + "','" + pago_hora + "','" + idcargo + "','" + nrodocumento + "','" + nrocuenta + "')";
+                + "values ('" + idjornal + "', '" + datos + "', '" + dni_jornal + "', '" + idcargo + "','" + pago_dia + "','" + pago_hora + "','" + dni_cuenta + "','" + nro_cuenta + "','" + idcliente + "')";
         int resultado = conectar.actualiza(st, query);
         if (resultado > -1) {
             registrado = true;
@@ -137,10 +146,12 @@ public class Jornal {
         Statement st = conectar.conexion();
         String query = "update jornaleros "
                 + "set datos = '" + this.datos + "', "
-                + "nrodocumento = '" + this.nrodocumento + "', "
-                + "nrocuenta = '" + this.nrocuenta + "', "
-                + "idcargo= '" + this.idcargo + "', "
-                + "hora_pago = '" + this.pago_hora + "' "
+                + "dni_trabajador = '" + this.dni_jornal + "', "
+                + "idcargo = '" + this.idcargo + "', "
+                + "dia_pago= '" + this.pago_dia + "', "
+                + "hora_pago = '" + this.pago_hora + "', "
+                + "dni_cuenta= '" + this.dni_cuenta + "', "
+                + "nrocuenta= '" + this.nro_cuenta + "' "
                 + "where idjornal = '" + idjornal + "'";
         int resultado = conectar.actualiza(st, query);
         if (resultado > -1) {
@@ -166,6 +177,44 @@ public class Jornal {
         return registrado;
     }
 
+    public boolean validarDNIJornal() {
+        boolean existe = false;
+        try {
+            Statement st = conectar.conexion();
+            String query = "select * from jornaleros "
+                    + "where dni_trabajador = '" + this.dni_jornal + "' ";
+            ResultSet rs = conectar.consulta(st, query);
+            if (rs.next()) {
+                existe = true;
+                this.idjornal = rs.getInt("idjornal");
+            }
+            conectar.cerrar(rs);
+            conectar.cerrar(st);
+        } catch (SQLException ex) {
+            System.out.println(ex.getLocalizedMessage());
+        }
+        return existe;
+    }
+
+    public boolean validarCuenta() {
+        boolean existe = false;
+        try {
+            Statement st = conectar.conexion();
+            String query = "select * from jornaleros "
+                    + "where dni_cuenta = '" + this.dni_cuenta + "' or nrocuenta = '" + this.nro_cuenta + "' ";
+            ResultSet rs = conectar.consulta(st, query);
+            if (rs.next()) {
+                existe = true;
+                this.idjornal = rs.getInt("idjornal");
+            }
+            conectar.cerrar(rs);
+            conectar.cerrar(st);
+        } catch (SQLException ex) {
+            System.out.println(ex.getLocalizedMessage());
+        }
+        return existe;
+    }
+
     public boolean obtenerDatos() {
         boolean existe = false;
         try {
@@ -180,8 +229,9 @@ public class Jornal {
                 this.pago_dia = rs.getDouble("dia_pago");
                 this.pago_hora = rs.getDouble("hora_pago");
                 this.idcargo = rs.getInt("idcargo");
-                this.nrodocumento = rs.getString("nrodocumento");
-                this.nrocuenta = rs.getString("nrocuenta");
+                this.dni_jornal = rs.getString("dni_trabajador");
+                this.dni_cuenta = rs.getString("dni_cuenta");
+                this.nro_cuenta = rs.getString("nrocuenta");
             }
             conectar.cerrar(rs);
             conectar.cerrar(st);
@@ -201,7 +251,7 @@ public class Jornal {
         };
         try {
             Statement st = conectar.conexion();
-            String sql = "select distinct(j.idjornal), j.datos, j.nrodocumento, j.nrocuenta, c.sede "
+            String sql = "select distinct(j.idjornal), j.datos, j.dni_trabajador, j.dni_cuenta, j.nrocuenta, c.sede "
                     + "from jornal_dia as jd "
                     + "inner join jornaleros as j on j.idjornal = jd.idjornal "
                     + "inner join clientes as c on jd.idcliente = c.idcliente "
@@ -221,7 +271,7 @@ public class Jornal {
                 Object fila[] = new Object[5];
                 fila[0] = rs.getString("idjornal");
                 fila[1] = rs.getString("datos");
-                fila[2] = rs.getString("nrodocumento");
+                fila[2] = rs.getString("dni_cuenta");
                 fila[3] = rs.getString("nrocuenta");
                 fila[4] = rs.getString("sede");
                 modelo.addRow(fila);
@@ -258,7 +308,7 @@ public class Jornal {
         };
         try {
             Statement st = conectar.conexion();
-            String sql = "select j.idjornal, j.datos, j.nrodocumento, j.nrocuenta, c.sede\n"
+            String sql = "select j.idjornal, j.datos, j.dni_cuenta, j.dni_trabajador, j.nrocuenta, c.sede "
                     + "from jornaleros as j "
                     + "inner join clientes as c on c.idcliente = j.idcliente "
                     + "where j.datos like '%" + texto + "%' "
@@ -266,18 +316,20 @@ public class Jornal {
             ResultSet rs = conectar.consulta(st, sql);
 
             modelo.addColumn("ID");
+            modelo.addColumn("DNI jornal");
             modelo.addColumn("Datos");
-            modelo.addColumn("Nro Documento");
+            modelo.addColumn("DNI Cuenta");
             modelo.addColumn("# Cuenta");
             modelo.addColumn("Sede");
 
             while (rs.next()) {
-                Object fila[] = new Object[5];
+                Object fila[] = new Object[6];
                 fila[0] = rs.getString("idjornal");
-                fila[1] = rs.getString("datos");
-                fila[2] = rs.getString("nrodocumento");
-                fila[3] = rs.getString("nrocuenta");
-                fila[4] = rs.getString("sede");
+                fila[1] = rs.getString("dni_trabajador");
+                fila[2] = rs.getString("datos");
+                fila[3] = rs.getString("dni_cuenta");
+                fila[4] = rs.getString("nrocuenta");
+                fila[5] = rs.getString("sede");
                 modelo.addRow(fila);
 
             }
@@ -285,14 +337,16 @@ public class Jornal {
             tabla.setModel(modelo);
 
             tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
-            tabla.getColumnModel().getColumn(1).setPreferredWidth(300);
-            tabla.getColumnModel().getColumn(2).setPreferredWidth(80);
-            tabla.getColumnModel().getColumn(3).setPreferredWidth(180);
+            tabla.getColumnModel().getColumn(1).setPreferredWidth(80);
+            tabla.getColumnModel().getColumn(2).setPreferredWidth(300);
+            tabla.getColumnModel().getColumn(3).setPreferredWidth(80);
             tabla.getColumnModel().getColumn(4).setPreferredWidth(180);
+            tabla.getColumnModel().getColumn(5).setPreferredWidth(180);
             varios.centrar_celda(tabla, 0);
-            varios.centrar_celda(tabla, 2);
+            varios.centrar_celda(tabla, 1);
             varios.centrar_celda(tabla, 3);
-            varios.derecha_celda(tabla, 4);
+            varios.centrar_celda(tabla, 4);
+            varios.derecha_celda(tabla, 5);
 
             conectar.cerrar(st);
             conectar.cerrar(rs);
@@ -314,24 +368,26 @@ public class Jornal {
             ResultSet rs = conectar.consulta(st, sql);
 
             modelo.addColumn("ID");
+            modelo.addColumn("DNI Jornal");
             modelo.addColumn("Datos");
-            modelo.addColumn("Nro Documento");
             modelo.addColumn("Cargo.");
             modelo.addColumn("Pago Dia");
             modelo.addColumn("Pago Hora");
+            modelo.addColumn("DNI Cuenta");
             modelo.addColumn("# Cuenta");
             modelo.addColumn("Sede");
 
             while (rs.next()) {
-                Object fila[] = new Object[8];
+                Object fila[] = new Object[9];
                 fila[0] = rs.getString("idjornal");
-                fila[1] = rs.getString("datos");
-                fila[2] = rs.getString("nrodocumento");
+                fila[1] = rs.getString("dni_trabajador");
+                fila[2] = rs.getString("datos");
                 fila[3] = rs.getString("ncargo");
                 fila[4] = varios.formato_numero(rs.getDouble("dia_pago"));
                 fila[5] = varios.formato_numero(rs.getDouble("hora_pago"));
-                fila[6] = rs.getString("nrocuenta");
-                fila[7] = rs.getString("sede");
+                fila[6] = rs.getString("dni_cuenta");
+                fila[7] = rs.getString("nrocuenta");
+                fila[8] = rs.getString("sede");
                 modelo.addRow(fila);
 
             }
@@ -339,19 +395,22 @@ public class Jornal {
             tabla.setModel(modelo);
 
             tabla.getColumnModel().getColumn(0).setPreferredWidth(50);
-            tabla.getColumnModel().getColumn(1).setPreferredWidth(350);
-            tabla.getColumnModel().getColumn(2).setPreferredWidth(80);
+            tabla.getColumnModel().getColumn(1).setPreferredWidth(90);
+            tabla.getColumnModel().getColumn(2).setPreferredWidth(350);
             tabla.getColumnModel().getColumn(3).setPreferredWidth(180);
             tabla.getColumnModel().getColumn(4).setPreferredWidth(80);
             tabla.getColumnModel().getColumn(5).setPreferredWidth(80);
-            tabla.getColumnModel().getColumn(6).setPreferredWidth(180);
-            tabla.getColumnModel().getColumn(7).setPreferredWidth(150);
+            tabla.getColumnModel().getColumn(6).setPreferredWidth(80);
+            tabla.getColumnModel().getColumn(7).setPreferredWidth(130);
+            tabla.getColumnModel().getColumn(8).setPreferredWidth(150);
             varios.centrar_celda(tabla, 0);
-            varios.centrar_celda(tabla, 2);
+            varios.centrar_celda(tabla, 1);
             varios.centrar_celda(tabla, 3);
             varios.derecha_celda(tabla, 4);
             varios.derecha_celda(tabla, 5);
             varios.centrar_celda(tabla, 6);
+            varios.centrar_celda(tabla, 7);
+            varios.centrar_celda(tabla, 8);
 
             conectar.cerrar(st);
             conectar.cerrar(rs);

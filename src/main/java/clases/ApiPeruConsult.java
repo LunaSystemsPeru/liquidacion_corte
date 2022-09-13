@@ -32,7 +32,7 @@ public class ApiPeruConsult {
         try {
             //Generar la URL
             //String url = SERVER_PATH + "consultas_json/composer/consulta_sunat_JMP.php?ruc=" + ruc;
-            String url = "http://chimbote.store/apis/peru-consult/public/consultaRUC.php?ruc=" + ruc;
+            String url = "https://chimbote.store/apis/peru-consult/public/consultaRUC.php?ruc=" + ruc;
             //Creamos un nuevo objeto URL con la url donde pedir el JSON
             URL obj = new URL(url);
             //Creamos un objeto de conexión
@@ -76,7 +76,7 @@ public class ApiPeruConsult {
         try {
             //Generar la URL
             //String url = SERVER_PATH + "consultas_json/composer/consultas_dni_JMP.php?dni=" + dni;
-            String url = "http://www.goempresarial.com/apis/peru-consult/public/consultaDNI.php?dni=" + dni;
+            String url = "https://www.goempresarial.com/apis/peru-consult/public/consultaDNI.php?dni=" + dni;
             //Creamos un nuevo objeto URL con la url donde pedir el JSON
             URL obj = new URL(url);
             //Creamos un objeto de conexión
