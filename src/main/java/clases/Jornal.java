@@ -130,7 +130,7 @@ public class Jornal {
 
         Statement st = conectar.conexion();
         String query = "insert into jornaleros "
-                + "values ('" + idjornal + "', '" + datos + "', '" + dni_jornal + "', '" + idcargo + "','" + pago_dia + "','" + pago_hora + "','" + dni_cuenta + "','" + nro_cuenta + "','" + idcliente + "')";
+                + "values ('" + idjornal + "', '" + datos + "','" + idcliente + "','" + pago_dia + "','" + pago_hora + "', '" + idcargo + "','" + dni_cuenta + "','" + nro_cuenta + "', '" + dni_jornal + "')";
         int resultado = conectar.actualiza(st, query);
         if (resultado > -1) {
             registrado = true;
@@ -182,7 +182,7 @@ public class Jornal {
         try {
             Statement st = conectar.conexion();
             String query = "select * from jornaleros "
-                    + "where dni_trabajador = '" + this.dni_jornal + "' ";
+                    + "where dni_trabajador = '" + this.dni_jornal + "' and idjornal != '" + this.idjornal + "' ";
             ResultSet rs = conectar.consulta(st, query);
             if (rs.next()) {
                 existe = true;
@@ -201,7 +201,7 @@ public class Jornal {
         try {
             Statement st = conectar.conexion();
             String query = "select * from jornaleros "
-                    + "where dni_cuenta = '" + this.dni_cuenta + "' or nrocuenta = '" + this.nro_cuenta + "' ";
+                    + "where (dni_cuenta = '" + this.dni_cuenta + "' or nrocuenta = '" + this.nro_cuenta + "') and idjornal != '" + this.idjornal + "'  ";
             ResultSet rs = conectar.consulta(st, query);
             if (rs.next()) {
                 existe = true;
@@ -251,11 +251,12 @@ public class Jornal {
         };
         try {
             Statement st = conectar.conexion();
-            String sql = "select distinct(j.idjornal), j.datos, j.dni_trabajador, j.dni_cuenta, j.nrocuenta, c.sede "
+            String sql = "select distinct(j.idjornal), j.datos, j.dni_trabajador, ob.nrodnititular as dni_cuenta, ob.nrocuenta as nrocuenta, c.sede "
                     + "from jornal_dia as jd "
                     + "inner join jornaleros as j on j.idjornal = jd.idjornal "
                     + "inner join clientes as c on jd.idcliente = c.idcliente "
-                    + "where j.nrocuenta = '' and jd.fecha between '" + fechainicio + "' and '" + fechafinal + "'  "
+                    + "left join obreros as ob on ob.nrodocumento = j.dni_trabajador and j.dni_trabajador != '' "
+                    + "where ob.nrocuenta = '' and jd.fecha between '" + fechainicio + "' and '" + fechafinal + "'  "
                     + "order by c.sede asc, j.datos asc";
 
             //and jd.idcliente = '" + this.idcliente + "'

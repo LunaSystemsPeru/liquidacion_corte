@@ -259,14 +259,14 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabel1" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
-                      <Component id="txt_datos" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel7" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                       <Component id="txt_dni_jornal" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                       <Component id="jButton5" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel1" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="txt_datos" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -443,6 +443,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txt_dni_cuenta">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <Events>
             <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_dni_cuentaKeyPressed"/>
             <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_dni_cuentaKeyTyped"/>
@@ -454,6 +457,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txt_nro_cuenta">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <Events>
             <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txt_nro_cuentaKeyPressed"/>
           </Events>
@@ -464,6 +470,7 @@
               <Image iconType="3" name="/icons/iconfinder_arrow-right_3688522.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Buscar Cuenta x DNI Jornal"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton6ActionPerformed"/>

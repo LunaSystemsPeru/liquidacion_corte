@@ -36,11 +36,12 @@ public class frm_ver_jornaleros extends javax.swing.JInternalFrame {
      */
     public frm_ver_jornaleros() {
         initComponents();
-        sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.dni_trabajador, j.dni_cuenta, j.nrocuenta, pd.descripcion as ncargo, c.sede "
+        sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.dni_trabajador, ob.nrodnititular as dni_cuenta, ob.nrocuenta as nrocuenta, pd.descripcion as ncargo, c.sede "
                 + "from jornal_dia as jd "
                 + "inner join jornaleros as j on j.idjornal = jd.idjornal "
                 + "inner join parametros_detalle as pd on pd.iddetalle = j.idcargo "
                 + "inner join clientes as c on c.idcliente = j.idcliente "
+                + "left join obreros as ob on ob.nrodocumento = j.dni_trabajador and j.dni_trabajador != '' "
                 + "where jd.fecha between date_sub(current_date(), interval 7 day) and current_date() "
                 + "group by jd.idjornal "
                 + "order by j.datos asc";
@@ -257,10 +258,11 @@ public class frm_ver_jornaleros extends javax.swing.JInternalFrame {
     private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             String texto = jTextField1.getText().trim();
-            sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.dni_trabajador, j.dni_cuenta, j.nrocuenta, pd.descripcion as ncargo, c.sede "
+            sql = "select j.idjornal, j.datos, j.dia_pago,j.hora_pago, j.dni_trabajador, ob.nrodnititular as dni_cuenta, ob.nrocuenta as nrocuenta, pd.descripcion as ncargo, c.sede "
                     + "from jornaleros as j "
                     + "inner join parametros_detalle as pd on pd.iddetalle = j.idcargo "
                     + "inner join clientes as c on c.idcliente = j.idcliente "
+                    + "left join obreros as ob on ob.nrodocumento = j.dni_trabajador and j.dni_trabajador != '' "
                     + "where datos like '%" + texto + "%' or j.dni_cuenta = '" + texto + "' or j.dni_trabajador = '" + texto + "' or j.nrocuenta = '" + texto + "' "
                     + "order by j.datos asc";
             jornal.verFilas(tbl_jornaleros, sql);

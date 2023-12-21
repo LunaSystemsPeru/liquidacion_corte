@@ -1122,17 +1122,29 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
         jTextField4.setText(jTable1.getValueAt(filaseleccionada, 1).toString());
         double pago = 0;
+        double pagodia = 0;
+        double pagohora = 0;
+        
         if (jTable1.getValueAt(filaseleccionada, 4).toString().equals("")) {
-            pago = 0;
+            pagodia = 0;
         } else {
-            pago = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 4).toString());
+            pagodia = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 4).toString());
+        }
+        
+        if (jTable1.getValueAt(filaseleccionada, 5).toString().equals("")) {
+            pagohora = 0;
+        } else {
+            pagohora = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 5).toString());
         }
 
+
         jRadioButton1.setSelected(true);
-        if (pago == 0) {
-            pago = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 5).toString());
-            jRadioButton2.setSelected(true);
+        if (pagodia == 0) {
+            pago = pagohora;
+        } else {
+            pago = pagodia;
         }
+        jRadioButton2.setSelected(true);
 
         jSpinner3.getModel();
         //String horainicio = new SimpleDateFormat("HH:mm").format(jSpinner1.getValue());

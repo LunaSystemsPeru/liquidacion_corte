@@ -30,6 +30,7 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     m_tipo mtipo = new m_tipo();
 
     public static Jornal jornal = new Jornal();
+    Jornal jornalValidator = new Jornal();
     ParametroDetalle ccargo = new ParametroDetalle();
     Varios varios = new Varios();
 
@@ -41,14 +42,14 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     public frm_reg_jornalero(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        txt_datos.requestFocus();
+        txt_dni_jornal.requestFocus();
 
         mtipo.llenarCargos(cbx_cargo);
 
         if (jornal.getIdjornal() == 0) {
             //para crear nuevo 
             jTextField4.setText("");
-            txt_datos.requestFocus();
+            txt_dni_jornal.requestFocus();
             jButton3.setEnabled(false);
         } else {
             jButton3.setEnabled(true);
@@ -109,7 +110,7 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         txt_nro_cuenta.setText("");
         txt_datos.setText("");
         txt_monto.setText("");
-        txt_datos.requestFocus();
+        txt_dni_jornal.requestFocus();
     }
 
     private boolean validarCuenta() {
@@ -121,11 +122,12 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
         if (dnicuenta.length() == 0) {
             dnicuenta = "XXX";
         } else {
-            jornal.setDni_jornal(dnicuenta);
-            if (jornal.validarDNIJornal()) {
-                jornal.obtenerDatos();
-                JOptionPane.showMessageDialog(null, "El # de DNI le pertenece a un jornalero \n" + jornal.getDatos());
-                encontrado = true;
+            jornalValidator.setDni_jornal(dnicuenta);
+            jornalValidator.setIdjornal(jornal.getIdjornal());
+            if (jornalValidator.validarDNIJornal()) {
+                jornalValidator.obtenerDatos();
+                JOptionPane.showMessageDialog(null, "El # de DNI le pertenece a un jornalero \n" + jornalValidator.getDatos());
+                // encontrado = true;
             }
         }
 
@@ -133,12 +135,13 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
             nrocuenta = "XXX";
         }
 
-        jornal.setDni_cuenta(dnicuenta);
-        jornal.setNro_cuenta(nrocuenta);
+        jornalValidator.setDni_cuenta(dnicuenta);
+        jornalValidator.setNro_cuenta(nrocuenta);
+        jornalValidator.setIdjornal(jornal.getIdjornal());
 
-        if (jornal.validarCuenta()) {
-            jornal.obtenerDatos();
-            JOptionPane.showMessageDialog(null, "El # de DNI y/o la cuenta ya esta afiliada a otra cuenta\n" + jornal.getDatos());
+        if (jornalValidator.validarCuenta()) {
+            jornalValidator.obtenerDatos();
+            JOptionPane.showMessageDialog(null, "El # de DNI y/o la cuenta ya esta afiliada a otra cuenta\n" + jornalValidator.getDatos());
             encontrado = true;
         } else {
             encontrado = false;
@@ -389,13 +392,13 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
                     .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_datos, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txt_dni_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_datos, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -413,6 +416,7 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
 
         jLabel10.setText("DNI Titular CTA");
 
+        txt_dni_cuenta.setEnabled(false);
         txt_dni_cuenta.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_dni_cuentaKeyPressed(evt);
@@ -424,6 +428,7 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
 
         jLabel2.setText("Nro Cuenta BCP:");
 
+        txt_nro_cuenta.setEnabled(false);
         txt_nro_cuenta.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txt_nro_cuentaKeyPressed(evt);
@@ -432,6 +437,7 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
 
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_arrow-right_3688522.png"))); // NOI18N
         jButton6.setText("Buscar Cuenta x DNI Jornal");
+        jButton6.setEnabled(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
@@ -522,7 +528,8 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     private void txt_datosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_datosKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             if (txt_datos.getText().length() > 0) {
-                txt_dni_jornal.requestFocus();
+                cbx_cargo.setEnabled(true);
+                cbx_cargo.requestFocus();
             }
         }
     }//GEN-LAST:event_txt_datosKeyPressed
@@ -538,8 +545,9 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
                     cbx_cargo.setEnabled(false);
                 } else {
                     //no esta registrado puede continuar
-                    cbx_cargo.setEnabled(true);
-                    cbx_cargo.requestFocus();
+                    jButton5.doClick();
+                    //  cbx_cargo.setEnabled(true);
+                    //  cbx_cargo.requestFocus();
                 }
 
             }
@@ -579,12 +587,12 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     }//GEN-LAST:event_txt_montoKeyPressed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        if (!validarCuenta()) {
-            llenar();
-            jornal.actualizar();
-            limpiar();
-            jButton4.doClick();
-        }
+        validarCuenta();
+        llenar();
+        jornal.actualizar();
+        limpiar();
+        jButton4.doClick();
+
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -592,15 +600,16 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
             try {
                 String json_datos = ApiPeruConsult.getJSONDNI(txt_dni_jornal.getText());
                 ArrayList datos = ApiPeruConsult.showJSONDNI(json_datos);
-                jTextField6.setText(txt_dni_jornal.getText());
-                jTextField7.setText(datos.get(0) + " " + datos.get(1) + " " + datos.get(2));
-
+                //jTextField6.setText(txt_dni_jornal.getText());
+                txt_datos.setText(datos.get(0) + " " + datos.get(1) + " " + datos.get(2));
+                txt_datos.requestFocus();
+                /*
                 jDialog1.setModal(true);
                 jDialog1.setSize(510, 170);
                 jDialog1.setLocationRelativeTo(null);
                 jDialog1.setVisible(true);
                 jTextField7.requestFocus();
-
+                 */
             } catch (ParseException ex) {
                 JOptionPane.showMessageDialog(null, ex.getLocalizedMessage());
             }
@@ -633,7 +642,7 @@ public class frm_reg_jornalero extends javax.swing.JDialog {
     }//GEN-LAST:event_txt_dni_cuentaKeyTyped
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
+        //buscar en db por dni y obtener datos
     }//GEN-LAST:event_jButton6ActionPerformed
 
     /**

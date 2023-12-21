@@ -101,10 +101,11 @@ public class ReporteJornal {
             titulos[8 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "SELECT jd.idjornal, j.dni_trabajador, j.datos, j.dni_cuenta, j.nrocuenta, car.descripcion, jd.dia_pago, jd.hora_pago, sum(jd.reintegro) as sreintegro, sum(jd.descuento) as sdescuento "
+        String sql = "SELECT jd.idjornal, j.dni_trabajador, j.datos, ifnull(o.nrodnititular, 0) as  dni_cuenta, ifnull(o.nrocuenta, 0) as nrocuenta, car.descripcion, jd.dia_pago, jd.hora_pago, sum(jd.reintegro) as sreintegro, sum(jd.descuento) as sdescuento "
                 + "from jornal_dia as jd "
                 + "inner join jornaleros as j on j.idjornal = jd.idjornal "
                 + "inner join parametros_detalle as car on car.iddetalle = j.idcargo "
+                + "left join obreros as o on o.nrodocumento = j.dni_trabajador "
                 + "where jd.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and jd.idcliente = '" + this.idcliente + "' and jd.idtipo = '" + this.idtipo + "'  "
                 + "group by jd.idjornal, jd.hora_pago, jd.dia_pago "
                 + "order by datos asc, hora_pago asc";
@@ -374,11 +375,12 @@ public class ReporteJornal {
             titulos[5 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "SELECT jd.idjornal, j.datos, j.dni_trabajador, j.dni_cuenta, "
+        String sql = "SELECT jd.idjornal, j.datos, j.dni_trabajador, ifnull(o.nrodnititular, 0) as dni_cuenta, ifnull(o.nrocuenta, 0) as nrocuenta, "
                 + subquery
                 + "j.nrocuenta "
                 + "from jornal_dia as jd "
                 + "inner join jornaleros as j on j.idjornal = jd.idjornal "
+                + "left join obreros as o on o.nrodocumento = j.dni_trabajador "
                 + "where jd.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and jd.idcliente = '" + this.idcliente + "' and jd.idtipo = '" + this.idtipo + "'  "
                 + "GROUP by jd.idjornal "
                 + "order by datos asc";
@@ -593,12 +595,13 @@ public class ReporteJornal {
             titulos[5 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "select ed.idjornal, j.datos, j.dni_trabajador, j.dni_cuenta, j.nrocuenta,  "
+        String sql = "select ed.idjornal, j.datos, j.dni_trabajador, ifnull(o.nrodnititular, 0) as  dni_cuenta, ifnull(o.nrocuenta, 0) as nrocuenta,  "
                 + subquery
                 + "sum(ed.adicional) as sadicional, sum(ed.descuento) as sdescuento, ee.cant_barriles "
                 + "from envase_detalle as ed  "
                 + "inner join jornaleros as j on j.idjornal = ed.idjornal "
                 + "inner join envase_equitativo as ee on ee.idenvase = ed.idenvase "
+                + "left join obreros as o on o.nrodocumento = j.dni_trabajador "
                 + "where ee.fecha BETWEEN '" + fecini + "' and '" + fecfin + "' and ee.idcliente = '" + this.idcliente + "' "
                 + "group by ed.idjornal "
                 + "order by j.datos asc";

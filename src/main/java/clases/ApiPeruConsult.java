@@ -76,7 +76,7 @@ public class ApiPeruConsult {
         try {
             //Generar la URL
             //String url = SERVER_PATH + "consultas_json/composer/consultas_dni_JMP.php?dni=" + dni;
-            String url = "https://www.goempresarial.com/apis/peru-consult/public/consultaDNI.php?dni=" + dni;
+            String url = "https://goempresarial.com/apis/peru-consult-api/public/api/v1/dni/" + dni + "?token=abcxyz";
             //Creamos un nuevo objeto URL con la url donde pedir el JSON
             URL obj = new URL(url);
             //Creamos un objeto de conexión
@@ -139,7 +139,7 @@ public class ApiPeruConsult {
         System.out.println(gsonObj.get("apellidoPaterno"));
         System.out.println(gsonObj.get("apellidoMaterno"));
         System.out.println(gsonObj.get("nombres"));
-        
+
         datos.add(gsonObj.get("apellidoPaterno").getAsString());
         datos.add(gsonObj.get("apellidoMaterno").getAsString());
         datos.add(gsonObj.get("nombres").getAsString());

@@ -63,10 +63,21 @@ public class Conectar {
         return conexion;
     }
 
+    // Métodos
+    public static Connection getConnection() {
+
+        if (conexion == null) {
+            Conectar conectar = new Conectar();
+        }
+
+        return conexion;
+    } // Fin getConnection
+
     public Statement conexion() {
         Statement st = null;
+        
         try {
-            st = conexion.createStatement();
+            st = Conectar.getConnection().createStatement();
         } catch (SQLException e) {
             System.out.println("Error: Conexión incorrecta.");
             e.printStackTrace();
