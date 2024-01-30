@@ -375,9 +375,9 @@ public class ReporteJornal {
             titulos[5 + i] = varios.fecha_usuario(date);
         }
 
-        String sql = "SELECT jd.idjornal, j.datos, j.dni_trabajador, ifnull(o.nrodnititular, 0) as dni_cuenta, ifnull(o.nrocuenta, 0) as nrocuenta, "
+        String sql = "SELECT jd.idjornal, j.datos, ifnull(j.dni_trabajador, 0) as dni_trabajador, ifnull(o.nrodnititular, 0) as dni_cuenta, "
                 + subquery
-                + "j.nrocuenta "
+                + "ifnull(o.nrocuenta, 0) as nrocuenta "
                 + "from jornal_dia as jd "
                 + "inner join jornaleros as j on j.idjornal = jd.idjornal "
                 + "left join obreros as o on o.nrodocumento = j.dni_trabajador "
@@ -385,7 +385,6 @@ public class ReporteJornal {
                 + "GROUP by jd.idjornal "
                 + "order by datos asc";
 
-        // System.out.println(sql);
         titulos[idias + 5] = "Total a Pagar";
 
         Statement st = conectar.conexion();
@@ -409,7 +408,6 @@ public class ReporteJornal {
                 objectfila[4] = rs.getString("nrocuenta");
 
                 for (int j = 5; j < idias + 5; j++) {
-
                     if (varios.esDecimal(rs.getString(j))) {
                         objectfila[j] = rs.getDouble(j);
                         dapagar += rs.getDouble(j);

@@ -11,14 +11,10 @@ import clases.Jornal;
 import clases.JornalDia;
 import clases.ParametroDetalle;
 import clases.Varios;
-import com.mxrck.autocompleter.AutoCompleterCallback;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import com.lunasystems.liquidacion.frm_principal;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,7 +25,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import objects.m_tipo;
-import objects.o_autocomplete;
 import objects.o_combobox;
 
 /**
@@ -51,10 +46,11 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
     //variables y objetos 
     DefaultTableModel modelo;
-    TextAutoCompleter tac_jornaleros = null;
 
     SpinnerDateModel dateModel = new SpinnerDateModel();
     int filaseleccionada;
+
+    public static int idjornalero = 0;
 
     /**
      * Creates new form frm_reg_jornal_dia
@@ -73,12 +69,6 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         cargarTabla();
 
         setearFecha(varios.getFechaActual());
-        /*
-        try {
-            //mostrarhorainicio();
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-        }*/
 
     }
 
@@ -165,47 +155,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
     }
 
-    private void cargarJornaleros() {
-        try {
-            if (tac_jornaleros != null) {
-                tac_jornaleros.removeAllItems();
-            }
-            tac_jornaleros = new TextAutoCompleter(txt_datos_jornalero, new AutoCompleterCallback() {
-                @Override
-                public void callback(Object selectedItem) {
-                    Object itemSelected = selectedItem;
-                    jornal.setIdjornal(0);
-                    if (itemSelected instanceof o_autocomplete) {
-                        int pcodigo = ((o_autocomplete) itemSelected).getId();
-                        String ptexto = ((o_autocomplete) itemSelected).getTexto();
-                        System.out.println("jornal seleccionado " + ptexto);
-                        jornal.setIdjornal(pcodigo);
-                    } else {
-                        System.out.println("El item es de un tipo desconocido");
-                    }
-                }
-            });
-
-            tac_jornaleros.setMode(0);
-            tac_jornaleros.setCaseSensitive(false);
-            Statement st = conectar.conexion();
-            String sql = "select * from jornaleros ";
-            //+ "where idcliente = '" + cliente.getIdcliente() + "'";
-            ResultSet rs = conectar.consulta(st, sql);
-            while (rs.next()) {
-                int iditem = rs.getInt("idjornal");
-                String descripcion = rs.getString("datos");
-                tac_jornaleros.addItem(new o_autocomplete(iditem, descripcion));
-            }
-            conectar.cerrar(rs);
-            conectar.cerrar(st);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error " + e.getLocalizedMessage());
-            System.out.println(e.getLocalizedMessage());
-        }
-    }
-
-    private boolean valida_tabla(int producto) {
+    private boolean valida_tabla(int idjornalero) {
         //estado de ingreso
         boolean ingresar = false;
         int cuenta_iguales = 0;
@@ -216,8 +166,8 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
             ingresar = true;
         } else {
             for (int j = 0; j < contar_filas; j++) {
-                int id_producto_fila = Integer.parseInt(jTable1.getValueAt(j, 0).toString());
-                if (producto == id_producto_fila) {
+                int idjornalero_fila = Integer.parseInt(jTable1.getValueAt(j, 0).toString());
+                if (idjornalero == idjornalero_fila) {
                     cuenta_iguales++;
                     JOptionPane.showMessageDialog(null, "El Item a Ingresar ya existe en la lista");
                     //limpiar();
@@ -237,7 +187,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         txt_monto.setText("");
 //        txt_horaingreso.setText("");
 //        txt_horasalida.setText("");
-        txt_datos_jornalero.requestFocus();
+        jButton1.doClick();
     }
 
     private void activar() {
@@ -279,6 +229,45 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         dt_fecha.setEnabled(true);
         cbx_tipo_jornal.setEnabled(true);
         jButton6.setEnabled(true);
+    }
+
+    private void setInfoJornalero() {
+        jornal.setIdjornal(idjornalero);
+        jornal.obtenerDatos();
+
+        int tipopago;
+
+        if (jornal.getPago_dia() > jornal.getPago_hora()) {
+            tipopago = 0;
+        } else {
+            tipopago = 1;
+        }
+
+        cbx_tipo_pago.setSelectedIndex(tipopago);
+
+        double montopago = 0;
+        if (tipopago == 0) {
+            montopago = jornal.getPago_dia();
+        }
+        if (tipopago == 1) {
+            montopago = jornal.getPago_hora();
+        }
+        txt_monto.setText(varios.formato_numero(montopago));
+
+        detalle.setIddetalle(jornal.getIdcargo());
+        detalle.obtenerDatos();
+
+        System.out.println(detalle.getDescripcion());
+
+        cbx_cargo.getModel().setSelectedItem(new o_combobox(detalle.getIddetalle(), detalle.getDescripcion()));
+
+        o_combobox otipo = (o_combobox) cbx_tipo_jornal.getSelectedItem();
+        if (otipo.getId() == 15) {
+            cbx_cargo.getModel().setSelectedItem(new o_combobox(14, "LIMPIEZA LINEA"));
+        }
+
+        idjornalero = 0;
+        cbx_cargo.requestFocus();
     }
 
     /**
@@ -356,6 +345,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         jLabel11 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         cbx_sinhoras = new javax.swing.JCheckBox();
+        jButton11 = new javax.swing.JButton();
 
         jDialog1.setTitle("Modificar Jornal del Dia");
 
@@ -569,6 +559,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
         jLabel3.setText("Jornalero:");
 
+        txt_datos_jornalero.setEditable(false);
         txt_datos_jornalero.setEnabled(false);
         txt_datos_jornalero.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -602,8 +593,8 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
         jLabel6.setText("Monto");
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Add_728898.png"))); // NOI18N
-        jButton1.setText("Jornal");
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/iconfinder_Magnifier_728952.png"))); // NOI18N
+        jButton1.setText("Buscar");
         jButton1.setEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -741,6 +732,15 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
         cbx_sinhoras.setText("Sin Horas");
 
+        jButton11.setText("set Info");
+        jButton11.setContentAreaFilled(false);
+        jButton11.setOpaque(true);
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -758,30 +758,35 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(cbx_cargo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txt_nombre_cliente)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txt_datos_jornalero)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(cbx_cargo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbx_tipo_pago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel6))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(dt_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbx_tipo_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbx_sinhoras)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jButton6)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbx_tipo_pago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_monto, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(dt_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbx_tipo_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbx_sinhoras)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton1))
-                            .addComponent(txt_datos_jornalero)
-                            .addComponent(txt_nombre_cliente)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jButton11)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txt_monto, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING))))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -815,15 +820,16 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(dt_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(cbx_tipo_jornal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(cbx_sinhoras, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(cbx_sinhoras, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton11)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txt_datos_jornalero, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txt_datos_jornalero, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -853,17 +859,25 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         cargarTabla();
-        cargarJornaleros();
         desactivar();
         dt_fecha.requestFocus();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Frame f = JOptionPane.getRootFrame();
+        frm_view_lista_jornaleros dialog = new frm_view_lista_jornaleros(f, true);
+        frm_view_lista_jornaleros.jTextField1.requestFocus();
+        dialog.tipo_origen = 1;
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
+        /*
+        Frame f = JOptionPane.getRootFrame();
         frm_reg_jornalero.jornal.setIdjornal(0);
         frm_reg_jornalero dialog = new frm_reg_jornalero(f, true);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+         */
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -889,8 +903,8 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         jornaldia.setFecha(fechadb);
 
         //cargar empleados
-        cargarJornaleros();
-        txt_datos_jornalero.requestFocus();
+        jButton1.setEnabled(true);
+        jButton1.doClick();
 
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -1027,22 +1041,6 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
 
 
     private void txt_datos_jornaleroKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_datos_jornaleroKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (txt_datos_jornalero.getText().length() > 8) {
-                jornal.obtenerDatos();
-                txt_monto.setText(varios.formato_numero(jornal.getPago_hora()));
-                detalle.setIddetalle(jornal.getIdcargo());
-                detalle.obtenerDatos();
-                if (cbx_sinhoras.isSelected()) {
-                    jTextField1.requestFocus();
-                    cbx_cargo.getModel().setSelectedItem(new o_combobox(14, "LIMPIEZA LINEA"));
-                    txt_monto.setText("0");
-                } else {
-                    cbx_cargo.getModel().setSelectedItem(new o_combobox(detalle.getIddetalle(), detalle.getDescripcion()));
-                    cbx_cargo.requestFocus();
-                }
-            }
-        }
 
     }//GEN-LAST:event_txt_datos_jornaleroKeyPressed
 
@@ -1124,19 +1122,18 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         double pago = 0;
         double pagodia = 0;
         double pagohora = 0;
-        
+
         if (jTable1.getValueAt(filaseleccionada, 4).toString().equals("")) {
             pagodia = 0;
         } else {
             pagodia = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 4).toString());
         }
-        
+
         if (jTable1.getValueAt(filaseleccionada, 5).toString().equals("")) {
             pagohora = 0;
         } else {
             pagohora = Double.parseDouble(jTable1.getValueAt(filaseleccionada, 5).toString());
         }
-
 
         jRadioButton1.setSelected(true);
         if (pagodia == 0) {
@@ -1258,6 +1255,10 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cbx_cargo_modKeyPressed
 
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        setInfoJornalero();
+    }//GEN-LAST:event_jButton11ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -1269,6 +1270,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
     private com.toedter.calendar.JDateChooser dt_fecha;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
+    public static javax.swing.JButton jButton11;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -1323,7 +1325,7 @@ public class frm_reg_jornal_dia extends javax.swing.JInternalFrame {
     private javax.swing.JTextField jTextField9;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
-    private javax.swing.JTextField txt_datos_jornalero;
+    public static javax.swing.JTextField txt_datos_jornalero;
     private javax.swing.JTextField txt_monto;
     private javax.swing.JTextField txt_nombre_cliente;
     // End of variables declaration//GEN-END:variables

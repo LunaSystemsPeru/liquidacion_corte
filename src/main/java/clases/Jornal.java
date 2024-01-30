@@ -309,9 +309,10 @@ public class Jornal {
         };
         try {
             Statement st = conectar.conexion();
-            String sql = "select j.idjornal, j.datos, j.dni_cuenta, j.dni_trabajador, j.nrocuenta, c.sede "
+            String sql = "select j.idjornal, j.datos, o.nrodnititular as dni_cuenta, o.nrocuenta as nrocuenta, j.dni_trabajador, c.sede "
                     + "from jornaleros as j "
                     + "inner join clientes as c on c.idcliente = j.idcliente "
+                    + "left join obreros as o on o.nrodocumento = j.dni_trabajador "
                     + "where j.datos like '%" + texto + "%' "
                     + "order by j.datos asc";
             ResultSet rs = conectar.consulta(st, sql);
@@ -347,7 +348,7 @@ public class Jornal {
             varios.centrar_celda(tabla, 1);
             varios.centrar_celda(tabla, 3);
             varios.centrar_celda(tabla, 4);
-            varios.derecha_celda(tabla, 5);
+            varios.centrar_celda(tabla, 5);
 
             conectar.cerrar(st);
             conectar.cerrar(rs);
